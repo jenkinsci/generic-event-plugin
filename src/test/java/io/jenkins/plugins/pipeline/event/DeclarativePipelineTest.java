@@ -4,11 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import java.util.Objects;
 
 import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
 
-import jenkins.branch.OrganizationFolder;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -19,6 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.MockFolder;
 
 import hudson.ExtensionList;
 import jenkins.branch.BranchSource;
@@ -76,14 +76,11 @@ public class DeclarativePipelineTest {
         sampleRepo.git("commit", "--all", "--message=flow");
         sampleRepo.git("checkout", "-b", "dev");
 
-        final OrganizationFolder folderProject = r.createProject(OrganizationFolder.class, "my-devops-project");
+        MockFolder folderProject = r.createFolder("my-devops-project");
         WorkflowMultiBranchProject project = new WorkflowMultiBranchProject(folderProject, "my-multi-branch-pipeline");
-//        WorkflowMultiBranchProject project = r.createProject(WorkflowMultiBranchProject.class, "multi-branch-pipeline");
         project.getSourcesList()
                 .add(new BranchSource(new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false)));
-        project.getSCMSources().forEach(source -> {
-            assertEquals(project, source.getOwner());
-        });
+        project.getSCMSources().forEach(source -> assertEquals(project, source.getOwner()));
 
         project.scheduleBuild2(0).getFuture().get();
         WorkflowJob branchProject = findBranchProject(project, "dev");
@@ -113,10 +110,11 @@ public class DeclarativePipelineTest {
         System.out.println("---%>---");
     }
 
-    private WorkflowRun runPipeline(String definition) throws IOException, InterruptedException, ExecutionException {
-        final WorkflowJob project = r.createProject(WorkflowJob.class, "example");
+    private WorkflowRun runPipeline(String definition) throws Exception {
+        MockFolder folderProject = r.createFolder("my-devops-project");
+        WorkflowJob project = folderProject.createProject(WorkflowJob.class, "example-pipeline");
         project.setDefinition(new CpsFlowDefinition(definition, true));
-        final WorkflowRun run = project.scheduleBuild2(0).waitForStart();
+        WorkflowRun run = Objects.requireNonNull(project.scheduleBuild2(0)).waitForStart();
         r.waitForCompletion(run);
         return run;
     }
