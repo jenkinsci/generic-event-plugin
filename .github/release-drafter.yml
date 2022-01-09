@@ -1,0 +1,2 @@
+_extends: .github
+tag-template: pipeline-event-$NEXT_MINOR_VERSION
