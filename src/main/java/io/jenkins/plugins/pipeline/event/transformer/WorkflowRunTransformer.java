@@ -1,8 +1,9 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.pipeline.event.transformer;
 
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import io.jenkins.plugins.pipeline.event.WorkflowRunData;
 import jenkins.branch.MultiBranchProject;
 
 public class WorkflowRunTransformer implements EventDataTransformer<WorkflowRun> {

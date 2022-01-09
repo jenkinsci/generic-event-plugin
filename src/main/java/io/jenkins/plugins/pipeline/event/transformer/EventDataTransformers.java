@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.pipeline.event.transformer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

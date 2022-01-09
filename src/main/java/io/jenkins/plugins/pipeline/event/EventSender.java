@@ -2,6 +2,8 @@ package io.jenkins.plugins.pipeline.event;
 
 import java.util.logging.Logger;
 
+import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformers;
+
 /**
  * An interface for sending event by various methods, like asynchronization or
  * synchronization.

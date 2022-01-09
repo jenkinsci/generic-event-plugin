@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.pipeline.event.transformer;
 
 public interface EventDataTransformer<T> {
 
