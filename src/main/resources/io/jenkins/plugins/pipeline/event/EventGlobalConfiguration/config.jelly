@@ -1,0 +1,10 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+  <f:section title="Event Dispatcher">
+    <f:entry title="${%Event Receiver}" field="receiver"
+             description="The receiver that can receive the workflow event.">
+      <f:textbox/>
+    </f:entry>
+  </f:section>
+</j:jelly>
+
