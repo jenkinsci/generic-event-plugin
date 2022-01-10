@@ -44,7 +44,7 @@ public class DeclarativePipelineTest {
         config.setReceiver("http://localhost:8000");
         ExtensionList<WorkflowRunListener> listeners = ExtensionList.lookup(WorkflowRunListener.class);
         listeners.forEach((listener) -> {
-            listener.setEventSender(new HttpEventSender());
+            listener.setEventSender(new EventSender.NoopEventSender());
         });
     }
 

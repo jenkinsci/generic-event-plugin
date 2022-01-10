@@ -12,7 +12,7 @@ public class WorkflowRunListener extends RunListener<WorkflowRun> {
     private EventSender eventSender;
 
     public WorkflowRunListener() {
-        this.setEventSender(new EventSender.NoopEventSender());
+        this.setEventSender(new HttpEventSender());
     }
 
     public void setEventSender(EventSender eventSender) {
