@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
+import io.jenkins.plugins.pipeline.event.json.EventJsonConfig;
 import net.sf.json.JSONObject;
 
 public class JSONTest {

@@ -13,6 +13,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
+import io.jenkins.plugins.pipeline.event.json.EventJsonConfig;
 import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformers;
 import net.sf.json.JSONObject;
 

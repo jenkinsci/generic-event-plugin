@@ -7,6 +7,8 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Event structure.
+ * 
+ * @author johnniang
  */
 public class Event {
 

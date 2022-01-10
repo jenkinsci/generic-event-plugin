@@ -7,6 +7,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.jenkins.plugins.pipeline.event.data.WorkflowRunData;
+
+/**
+ * EventDataTransformers is a set of event data transformers and is responsible
+ * for picking a proper transformer to transform an object. It also supports
+ * transformer registering and unregistering.
+ * 
+ * It's lazy-load and a singleton type.
+ * 
+ * @author johnniang
+ * 
+ */
 public enum EventDataTransformers implements EventDataTransformer<Object> {
 
     INSTANCE;
@@ -15,7 +27,8 @@ public enum EventDataTransformers implements EventDataTransformer<Object> {
 
     EventDataTransformers() {
         this.transformers = new HashMap<>();
-        register(new WorkflowRunTransformer());
+        // register other event data transformer.
+        register(new WorkflowRunData.WorkflowRunTransformer());
     }
 
     public void register(EventDataTransformer<?> transformer) {

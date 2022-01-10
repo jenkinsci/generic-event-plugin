@@ -61,7 +61,6 @@ public class DeclarativePipelineTest {
                 "    }",
                 "  }",
                 "}"));
-        // final WorkflowRun run = runPipeline("echo 'Hello World!'");
         r.assertBuildStatusSuccess(run);
         r.assertLogContains("Hello World!", run);
     }
@@ -77,7 +76,7 @@ public class DeclarativePipelineTest {
         sampleRepo.git("checkout", "-b", "dev");
 
         MockFolder folderProject = r.createFolder("my-devops-project");
-        WorkflowMultiBranchProject project = new WorkflowMultiBranchProject(folderProject, "my-multi-branch-pipeline");
+        WorkflowMultiBranchProject project = folderProject.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-pipeline");
         project.getSourcesList()
                 .add(new BranchSource(new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false)));
         project.getSCMSources().forEach(source -> assertEquals(project, source.getOwner()));
