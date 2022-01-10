@@ -49,7 +49,11 @@
                 <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.277.x</artifactId>
-                <version>984.vb5eaac999a7e</version>
+                <!-- 
+                    Downgrade bom version from 984.vb5eaac999a7e to 876.vc43b4c6423b6 due to being compatiable with workflow-multibranch 2.24 and scm-api 2.6.4.
+                    Please refer to https://github.com/jenkinsci/bom/releases/tag/876.vc43b4c6423b6 
+                -->
+                <version>876.vc43b4c6423b6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
