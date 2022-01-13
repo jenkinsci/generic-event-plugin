@@ -6,6 +6,8 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformer;
 import jenkins.branch.MultiBranchProject;
 
+import java.util.Objects;
+
 /**
  * WorkflowRun data structure. It contains the raw data of WorkflowRun.
  *
@@ -51,6 +53,20 @@ public class WorkflowRunData {
 
     public void setRun(WorkflowRun run) {
         this.run = run;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorkflowRunData that = (WorkflowRunData) o;
+        return isMultiBranch == that.isMultiBranch && Objects.equals(parentFullName, that.parentFullName)
+                && Objects.equals(projectName, that.projectName) && Objects.equals(run, that.run);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(parentFullName, projectName, isMultiBranch, run);
     }
 
     @Override

@@ -1,13 +1,14 @@
 package io.jenkins.plugins.pipeline.event;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
  * Event structure.
- * 
+ *
  * @author johnniang
  */
 public class Event {
@@ -129,59 +130,20 @@ public class Event {
         this.data = data;
     }
 
+
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((data == null) ? 0 : data.hashCode());
-        result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((source == null) ? 0 : source.hashCode());
-        result = prime * result + ((time == null) ? 0 : time.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(type, event.type) && Objects.equals(source, event.source) && Objects.equals(id, event.id)
+                && Objects.equals(time, event.time) && Objects.equals(dataType, event.dataType)
+                && Objects.equals(data, event.data);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Event other = (Event) obj;
-        if (data == null) {
-            if (other.data != null)
-                return false;
-        } else if (!data.equals(other.data))
-            return false;
-        if (dataType == null) {
-            if (other.dataType != null)
-                return false;
-        } else if (!dataType.equals(other.dataType))
-            return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (source == null) {
-            if (other.source != null)
-                return false;
-        } else if (!source.equals(other.source))
-            return false;
-        if (time == null) {
-            if (other.time != null)
-                return false;
-        } else if (!time.equals(other.time))
-            return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(type, source, id, time, dataType, data);
     }
 
     @Override
