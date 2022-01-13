@@ -17,14 +17,18 @@ import io.jenkins.plugins.pipeline.event.json.EventJsonConfig;
 import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformers;
 import net.sf.json.JSONObject;
 
+/**
+ * An implementation of EventSender, which sends event body via HTTP.
+ * 
+ * @author johnniang
+ */
 public class HttpEventSender implements EventSender {
 
     private final Logger logger = Logger.getLogger(HttpEventSender.class.getName());
 
     @Override
     public void send(Event event) {
-        Object transformedData = EventDataTransformers.INSTANCE.transform(event.getData());
-        event.setData(transformedData);
+        EventDataTransformers.INSTANCE.transform(event);
 
         // serialize event to JSON string
         String receiver = EventGlobalConfiguration.get().getReceiver();

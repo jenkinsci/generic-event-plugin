@@ -22,6 +22,7 @@ import org.jvnet.hudson.test.MockFolder;
 
 import hudson.ExtensionList;
 import jenkins.branch.BranchSource;
+import jenkins.model.JenkinsLocationConfiguration;
 import jenkins.plugins.git.GitBranchSCMHead;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
@@ -46,6 +47,8 @@ public class DeclarativePipelineTest {
         listeners.forEach((listener) -> {
             listener.setEventSender(new EventSender.NoopEventSender());
         });
+        // simulate outside HTTP request
+        JenkinsLocationConfiguration.get().setUrl(null);
     }
 
     @Test

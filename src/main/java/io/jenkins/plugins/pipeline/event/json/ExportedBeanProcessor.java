@@ -7,10 +7,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.export.DataWriter;
+import org.kohsuke.stapler.export.ExportConfig;
+import org.kohsuke.stapler.export.ExportInterceptor;
 import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.export.Flavor;
 import org.kohsuke.stapler.export.Model;
 import org.kohsuke.stapler.export.ModelBuilder;
+import org.kohsuke.stapler.export.Property;
 
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
@@ -33,7 +36,8 @@ public class ExportedBeanProcessor implements JsonBeanProcessor {
         final StringWriter stringWriter = new StringWriter();
         final DataWriter dataWriter;
         try {
-            dataWriter = Flavor.JSON.createDataWriter(value, stringWriter);
+            ExportConfig exportConfig = new ExportConfig().withExportInterceptor(new IgnoreURLExportInterceptor());
+            dataWriter = Flavor.JSON.createDataWriter(value, stringWriter, exportConfig);
             Model model = new ModelBuilder().get(value.getClass());
             model.writeTo(value, dataWriter);
             // return the JSON but as an object
@@ -54,6 +58,18 @@ public class ExportedBeanProcessor implements JsonBeanProcessor {
                 return ExportedBean.class;
             }
             return DEFAULT.getMatch(target, set);
+        }
+
+    }
+
+    public static class IgnoreURLExportInterceptor extends ExportInterceptor {
+
+        @Override
+        public Object getValue(Property property, Object model, ExportConfig config) throws IOException {
+            if (property.name.equals("url")) {
+                return SKIP;
+            }
+            return DEFAULT.getValue(property, model, config);
         }
 
     }

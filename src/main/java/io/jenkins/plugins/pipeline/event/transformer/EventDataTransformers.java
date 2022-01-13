@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.jenkins.plugins.pipeline.event.Event;
 import io.jenkins.plugins.pipeline.event.data.WorkflowRunData;
 
 /**
@@ -19,7 +20,7 @@ import io.jenkins.plugins.pipeline.event.data.WorkflowRunData;
  * @author johnniang
  * 
  */
-public enum EventDataTransformers implements EventDataTransformer<Object> {
+public enum EventDataTransformers {
 
     INSTANCE;
 
@@ -27,8 +28,8 @@ public enum EventDataTransformers implements EventDataTransformer<Object> {
 
     EventDataTransformers() {
         this.transformers = new HashMap<>();
-        // register other event data transformer.
         register(new WorkflowRunData.WorkflowRunTransformer());
+        // TODO register other event data transformers.
     }
 
     public void register(EventDataTransformer<?> transformer) {
@@ -43,15 +44,21 @@ public enum EventDataTransformers implements EventDataTransformer<Object> {
         return Collections.unmodifiableCollection(transformers.values());
     }
 
-    @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Object transform(Object data) {
-        EventDataTransformer transformer = transformers.get(data.getClass());
-        if (transformer == null) {
-            // if not transformer found, just return the object only
-            return data;
+    public void transform(Event event) {
+        if (event == null || event.getData() == null) {
+            return;
         }
-        return transformer.transform(data);
+        EventDataTransformer transformer = transformers.get(event.getData().getClass());
+        if (transformer == null) {
+            // if not transformer found, nothing need to do
+            return;
+        }
+        Object transformedData = transformer.transform(event.getData());
+        event.setData(transformedData);
+        if (transformedData != null) {
+            event.setDataType(transformedData.getClass().getName());
+        }
     }
 
     private Type getActualArgumentType(EventDataTransformer<?> transformer) {

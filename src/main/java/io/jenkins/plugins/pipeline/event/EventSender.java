@@ -7,6 +7,8 @@ import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformers;
 /**
  * An interface for sending event by various methods, like asynchronization or
  * synchronization.
+ * 
+ * @author johnniang
  */
 public interface EventSender {
 
@@ -19,8 +21,7 @@ public interface EventSender {
         @Override
         public void send(Event event) {
             // try to transform data
-            Object transformedData = EventDataTransformers.INSTANCE.transform(event.getData());
-            event.setData(transformedData);
+            EventDataTransformers.INSTANCE.transform(event);
 
             // Just log the event
             logger.info("Sent event: " + event.toString());

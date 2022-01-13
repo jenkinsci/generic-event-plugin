@@ -6,12 +6,19 @@ import hudson.Extension;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 
+/**
+ * WorkflowRunListener listens all WorkflowRun events, including onCompleted,
+ * onDeleted, onFinalized, onInitialize and onStarted events.
+ * 
+ * @author johnniang
+ */
 @Extension
 public class WorkflowRunListener extends RunListener<WorkflowRun> {
 
     private EventSender eventSender;
 
     public WorkflowRunListener() {
+        // Set HTTP event sender by default
         this.setEventSender(new HttpEventSender());
     }
 

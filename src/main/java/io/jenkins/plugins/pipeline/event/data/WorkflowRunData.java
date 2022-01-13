@@ -17,11 +17,7 @@ public class WorkflowRunData {
 
     private String projectName;
 
-    private int number;
-
     private boolean isMultiBranch;
-
-    private String revision;
 
     private WorkflowRun run;
 
@@ -41,14 +37,6 @@ public class WorkflowRunData {
         this.projectName = projectName;
     }
 
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
     public boolean isMultiBranch() {
         return isMultiBranch;
     }
@@ -57,20 +45,12 @@ public class WorkflowRunData {
         this.isMultiBranch = isMultiBranch;
     }
 
-    public String getRevision() {
-        return revision;
-    }
-
-    public void setRevision(String revision) {
-        this.revision = revision;
-    }
-
-    public WorkflowRun getRaw() {
+    public WorkflowRun getRun() {
         return run;
     }
 
-    public void setRaw(WorkflowRun raw) {
-        this.run = raw;
+    public void setRun(WorkflowRun run) {
+        this.run = run;
     }
 
     public static class WorkflowRunTransformer implements EventDataTransformer<WorkflowRun> {
@@ -78,21 +58,13 @@ public class WorkflowRunData {
         @Override
         public Object transform(WorkflowRun run) {
             WorkflowRunData data = new WorkflowRunData();
-            data.setRaw(run);
-            data.setNumber(run.getNumber());
+            data.setRun(run);
             WorkflowJob project = run.getParent();
-
             data.setProjectName(project.getName());
             data.setParentFullName(project.getParent().getFullName());
-
             if (project.getParent() instanceof MultiBranchProject) {
                 data.setMultiBranch(true);
-                data.setRevision(project.getName());
-                MultiBranchProject<?, ?> multiBranchProject = (MultiBranchProject<?, ?>) project.getParent();
-                data.setProjectName(multiBranchProject.getName());
-                data.setParentFullName(multiBranchProject.getParent().getFullName());
             }
-
             return data;
         }
 

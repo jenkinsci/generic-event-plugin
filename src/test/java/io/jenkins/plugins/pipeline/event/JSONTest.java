@@ -10,7 +10,7 @@ import net.sf.json.JSONObject;
 public class JSONTest {
     @Test
     public void jsonTest() {
-        Event data = new Event.EventBuilder().data(new ExportedData(10, "johnniang")).build();
+        Event data = new Event.EventBuilder().data(new ExportedData(10, "this is an URL", "johnniang")).build();
         String dataJSON = JSONObject.fromObject(data, new EventJsonConfig()).toString(4);
         System.out.println(dataJSON);
 
@@ -25,7 +25,16 @@ public class JSONTest {
         @Exported
         private int age;
 
+        @Exported
+        private String url;
+
         private String name;
+
+        public ExportedData(int age, String url, String name) {
+            this.age = age;
+            this.url = url;
+            this.name = name;
+        }
 
         public ExportedData(int age, String name) {
             this.age = age;
@@ -51,6 +60,14 @@ public class JSONTest {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
     }
 

@@ -10,6 +10,7 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension(ordinal = 100)
 @Symbol("eventDispatcher")
 public class EventGlobalConfiguration extends GlobalConfiguration {
+
     private String receiver;
 
     public EventGlobalConfiguration() {
