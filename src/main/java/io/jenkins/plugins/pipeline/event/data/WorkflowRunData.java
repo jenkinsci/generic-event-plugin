@@ -8,7 +8,7 @@ import jenkins.branch.MultiBranchProject;
 
 /**
  * WorkflowRun data structure. It contains the raw data of WorkflowRun.
- * 
+ *
  * @author johnniang
  */
 public class WorkflowRunData {
@@ -51,6 +51,16 @@ public class WorkflowRunData {
 
     public void setRun(WorkflowRun run) {
         this.run = run;
+    }
+
+    @Override
+    public String toString() {
+        return "WorkflowRunData{" +
+                "parentFullName='" + parentFullName + '\'' +
+                ", projectName='" + projectName + '\'' +
+                ", isMultiBranch=" + isMultiBranch +
+                ", run=" + run +
+                '}';
     }
 
     public static class WorkflowRunTransformer implements EventDataTransformer<WorkflowRun> {

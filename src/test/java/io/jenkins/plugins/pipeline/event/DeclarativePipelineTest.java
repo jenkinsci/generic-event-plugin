@@ -8,6 +8,8 @@ import java.util.Objects;
 
 import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
 
+import hudson.model.BooleanParameterDefinition;
+import hudson.model.ParametersDefinitionProperty;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -44,9 +46,7 @@ public class DeclarativePipelineTest {
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setReceiver("http://localhost:8000");
         ExtensionList<WorkflowRunListener> listeners = ExtensionList.lookup(WorkflowRunListener.class);
-        listeners.forEach((listener) -> {
-            listener.setEventSender(new EventSender.NoopEventSender());
-        });
+        listeners.forEach((listener) -> listener.setEventSender(new EventSender.NoopEventSender()));
         // simulate outside HTTP request
         JenkinsLocationConfiguration.get().setUrl(null);
     }
@@ -84,7 +84,7 @@ public class DeclarativePipelineTest {
                 .add(new BranchSource(new GitSCMSource(null, sampleRepo.toString(), "", "*", "", false)));
         project.getSCMSources().forEach(source -> assertEquals(project, source.getOwner()));
 
-        project.scheduleBuild2(0).getFuture().get();
+        Objects.requireNonNull(project.scheduleBuild2(0)).getFuture().get();
         WorkflowJob branchProject = findBranchProject(project, "dev");
         assertEquals(new GitBranchSCMHead("dev"), SCMHead.HeadByItem.findHead(branchProject));
         assertEquals(2, project.getItems().size());
@@ -116,6 +116,11 @@ public class DeclarativePipelineTest {
         MockFolder folderProject = r.createFolder("my-devops-project");
         WorkflowJob project = folderProject.createProject(WorkflowJob.class, "example-pipeline");
         project.setDefinition(new CpsFlowDefinition(definition, true));
+
+        BooleanParameterDefinition skipDefinition = new BooleanParameterDefinition("skip", false, "Should we skip this step");
+        ParametersDefinitionProperty paramsDefProperty = new ParametersDefinitionProperty(skipDefinition);
+        project.addProperty(paramsDefProperty);
+
         WorkflowRun run = Objects.requireNonNull(project.scheduleBuild2(0)).waitForStart();
         r.waitForCompletion(run);
         return run;
