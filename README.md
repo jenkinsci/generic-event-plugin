@@ -2,27 +2,38 @@
 
 ## Introduction
 
-TODO Describe what your plugin does here
+The Pipeline Event Plugin built for Jenkins is mainly to solve the interaction problem between the third-party system and Jenkins.
 
-## Getting started
+By using the plugin, the third-party system can receive the events it is interested in more quickly and respond quickly.
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+At present, our event body mainly refers to CloudEvents, and CloudEvents specification may be supported in the future. We look forward to more people to push this goal.
 
-## Issues
+## Getting Started
 
-TODO Decide where you're going to host your issues, the default is Jenkins JIRA, but you can also enable GitHub issues,
-If you use GitHub issues there's no need for this section; else add the following line:
+You can configure the event receiver in system management:
 
-Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins-ci.org/).
+```txt
+Event Dispatcher
+
+Event Receiver
+,-----------------------------------------------.
+|http://localhost:8000/v1alpha1/webhooks/jenkins|
+`-----------------------------------------------'
+The receiver that can receive the workflow event.
+```
+
+## Events Ducumentation
+
+After the event receiver is configured, we can easily receive events from Jenkins. The following is the detailed document of the corresponding event:
+
+- [WorkflowRun Event](docs/workflowrun.md)
+- [WorkflowJob Event](docs/workflowjob.md)
 
 ## Contributing
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
-
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+Please refer to [Developer Guide](docs/developer.md).
 
 ## LICENSE
 
-Licensed under MIT, see [LICENSE](LICENSE.md)
+Licensed under Apache 2.0, see [LICENSE](LICENSE.md)
 
