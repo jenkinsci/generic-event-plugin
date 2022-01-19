@@ -12,14 +12,14 @@
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <name>Pipeline Event Plugin</name>
-    <url>https://github.com/johnniang/${project.artifactId}-plugin</url>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <description>
-        The Pipeline Event Plugin has designed an opinionated way to send events related with Pipeline
+        Allows users to receive events related with Pipeline via webhook.
     </description>
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
+            <name>Apache License, Version 2.0</name>
+            <url>https://opensource.org/licenses/Apache-2.0</url>
         </license>
     </licenses>
     <developers>
@@ -43,7 +43,7 @@
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.277.4</jenkins.version>
         <java.level>8</java.level>
-        <gitHubRepo>johnniang/${project.artifactId}-plugin</gitHubRepo>
+        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
     </properties>
 
     <dependencyManagement>
