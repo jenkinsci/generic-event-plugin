@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.generic.event;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,8 +13,8 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
-import io.jenkins.plugins.pipeline.event.json.EventJsonConfig;
-import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformers;
+import io.jenkins.plugins.generic.event.json.EventJsonConfig;
+import io.jenkins.plugins.generic.event.transformer.EventDataTransformers;
 import net.sf.json.JSONObject;
 
 /**
@@ -36,6 +36,7 @@ public class HttpEventSender implements EventSender {
             logger.info("Skipped event sending due to receiver URL not set");
             return;
         }
+        // TODO Make HTTP request asynchronous
         try (final CloseableHttpClient client = HttpClients.createDefault()) {
             String eventJSON = JSONObject.fromObject(event, new EventJsonConfig()).toString(4);
             HttpEntity httpEntity = EntityBuilder.create()

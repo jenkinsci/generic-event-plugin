@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event.json;
+package io.jenkins.plugins.generic.event.json;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.json.JSONException;
 import org.kohsuke.stapler.export.DataWriter;
 import org.kohsuke.stapler.export.ExportConfig;
 import org.kohsuke.stapler.export.ExportInterceptor;
@@ -43,16 +44,14 @@ public class ExportedBeanProcessor implements JsonBeanProcessor {
             // return the JSON but as an object
             return JSONObject.fromObject(stringWriter.toString());
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to serialize @Exported data", e);
+            throw new JSONException("Failed to serialize @Exported model", e);
         }
-        // fallback to original value
-        return JSONObject.fromObject(value);
     }
 
     public static class Matcher extends JsonBeanProcessorMatcher {
 
         @Override
-        @SuppressWarnings({ "rawtypes", "unchecked" })
+        @SuppressWarnings({"unchecked" })
         public Object getMatch(Class target, Set set) {
             if (target != null && target.isAnnotationPresent(ExportedBean.class)) {
                 return ExportedBean.class;

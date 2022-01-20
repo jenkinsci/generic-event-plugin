@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event.transformer;
+package io.jenkins.plugins.generic.event.transformer;
 
 /**
  * This interface is responsible for transforming object with specific type to

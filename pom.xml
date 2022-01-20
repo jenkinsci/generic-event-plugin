@@ -8,13 +8,13 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>pipeline-event</artifactId>
+    <artifactId>generic-event</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
-    <name>Pipeline Event Plugin</name>
+    <name>Generic Event Plugin</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <description>
-        Allows users to receive events related with Pipeline via webhook.
+        Allows users to receive events fired by system via webhook.
     </description>
     <licenses>
         <license>
@@ -90,6 +90,11 @@
             <artifactId>httpclient5</artifactId>
             <version>5.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>typetools</artifactId>
+            <version>0.6.3</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jenkinsci.plugins</groupId>
@@ -117,6 +122,13 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>scm-api</artifactId>
             <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

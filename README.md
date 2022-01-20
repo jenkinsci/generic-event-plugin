@@ -1,8 +1,8 @@
-# Pipeline Event Plugin
+# Generic Event Plugin
 
 ## Introduction
 
-The Pipeline Event Plugin built for Jenkins is mainly to solve the interaction problem between the third-party system and Jenkins.
+The Generic Event Plugin built for Jenkins is mainly to solve the interaction problem between the third-party system and Jenkins.
 
 By using the plugin, the third-party system can receive the events it is interested in more quickly and respond quickly.
 
@@ -19,7 +19,7 @@ Event Receiver
 ,-----------------------------------------------.
 |http://localhost:8000/v1alpha1/webhooks/jenkins|
 `-----------------------------------------------'
-The receiver that can receive the workflow event.
+The receiver that can receive the event fired by system.
 ```
 
 ## Events Ducumentation

@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event.json;
+package io.jenkins.plugins.generic.event.json;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -9,7 +9,7 @@ import net.sf.json.processors.JsonValueProcessor;
 
 /**
  * InstantProcessor is a JSON value processor for instant type.
- * 
+ *
  * @author johnniang
  */
 public class InstantProcessor implements JsonValueProcessor {
@@ -21,7 +21,7 @@ public class InstantProcessor implements JsonValueProcessor {
 
     @Override
     public Object processArrayValue(Object value, JsonConfig jsonConfig) {
-        return formatter.format((Instant) value);
+        return value == null ? null : formatter.format((Instant) value);
     }
 
     @Override

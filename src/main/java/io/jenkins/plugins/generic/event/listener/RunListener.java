@@ -1,24 +1,19 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.generic.event.listener;
 
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.model.listeners.RunListener;
+import io.jenkins.plugins.generic.event.Event;
+import io.jenkins.plugins.generic.event.EventSender;
+import io.jenkins.plugins.generic.event.HttpEventSender;
 
-/**
- * WorkflowRunListener listens all WorkflowRun events, including onCompleted,
- * onDeleted, onFinalized, onInitialize and onStarted events.
- * 
- * @author johnniang
- */
 @Extension
-public class WorkflowRunListener extends RunListener<WorkflowRun> {
+public class RunListener extends hudson.model.listeners.RunListener<Run<?, ?>> {
 
     private EventSender eventSender;
 
-    public WorkflowRunListener() {
-        // Set HTTP event sender by default
+    public RunListener() {
         this.setEventSender(new HttpEventSender());
     }
 
@@ -27,7 +22,7 @@ public class WorkflowRunListener extends RunListener<WorkflowRun> {
     }
 
     @Override
-    public void onCompleted(WorkflowRun r, TaskListener listener) {
+    public void onCompleted(Run<?, ?> r, @NonNull TaskListener listener) {
         eventSender.send(new Event.EventBuilder()
                 .type("run.completed")
                 .source(r.getParent().getUrl())
@@ -35,8 +30,9 @@ public class WorkflowRunListener extends RunListener<WorkflowRun> {
                 .build());
     }
 
+
     @Override
-    public void onDeleted(WorkflowRun r) {
+    public void onDeleted(Run<?, ?> r) {
         eventSender.send(new Event.EventBuilder()
                 .type("run.deleted")
                 .source(r.getParent().getUrl())
@@ -45,7 +41,7 @@ public class WorkflowRunListener extends RunListener<WorkflowRun> {
     }
 
     @Override
-    public void onFinalized(WorkflowRun r) {
+    public void onFinalized(Run<?, ?> r) {
         eventSender.send(new Event.EventBuilder()
                 .type("run.finalized")
                 .source(r.getParent().getUrl())
@@ -54,7 +50,7 @@ public class WorkflowRunListener extends RunListener<WorkflowRun> {
     }
 
     @Override
-    public void onInitialize(WorkflowRun r) {
+    public void onInitialize(Run<?, ?> r) {
         eventSender.send(new Event.EventBuilder()
                 .type("run.initialize")
                 .source(r.getParent().getUrl())
@@ -63,7 +59,7 @@ public class WorkflowRunListener extends RunListener<WorkflowRun> {
     }
 
     @Override
-    public void onStarted(WorkflowRun r, TaskListener listener) {
+    public void onStarted(Run<?, ?> r, TaskListener listener) {
         eventSender.send(new Event.EventBuilder()
                 .type("run.started")
                 .source(r.getParent().getUrl())

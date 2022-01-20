@@ -55,7 +55,7 @@
     },
     "projectName": "main"
   },
-  "dataType": "io.jenkins.plugins.pipeline.event.data.WorkflowRunData",
+  "dataType": "WorkflowRunData",
   "id": "7cdd07b9-cf58-4d9a-9719-9849aaf93911",
   "source": "job/my-devops-project/job/my-multi-branch-pipeline/job/main/",
   "time": "2022-01-18T17:53:27.998+0800",
@@ -118,7 +118,7 @@
     },
     "projectName": "main"
   },
-  "dataType": "io.jenkins.plugins.pipeline.event.data.WorkflowRunData",
+  "dataType": "WorkflowRunData",
   "id": "6f2e1eab-4109-465e-ac2d-e2f0b9dc24ce",
   "source": "job/my-devops-project/job/my-multi-branch-pipeline/job/main/",
   "time": "2022-01-18T17:53:28.008+0800",
@@ -184,7 +184,7 @@
     },
     "projectName": "main"
   },
-  "dataType": "io.jenkins.plugins.pipeline.event.data.WorkflowRunData",
+  "dataType": "WorkflowRunData",
   "id": "8e285ad8-b11a-4fe9-9cfe-adfe52d2b1fe",
   "source": "job/my-devops-project/job/my-multi-branch-pipeline/job/main/",
   "time": "2022-01-18T17:53:28.484+0800",
@@ -250,7 +250,7 @@
     },
     "projectName": "main"
   },
-  "dataType": "io.jenkins.plugins.pipeline.event.data.WorkflowRunData",
+  "dataType": "WorkflowRunData",
   "id": "c9d2e7a6-ebc6-477e-afde-4267fcfd8d34",
   "source": "job/my-devops-project/job/my-multi-branch-pipeline/job/main/",
   "time": "2022-01-18T17:53:28.530+0800",
@@ -316,7 +316,7 @@
     },
     "projectName": "main"
   },
-  "dataType": "io.jenkins.plugins.pipeline.event.data.WorkflowRunData",
+  "dataType": "WorkflowRunData",
   "id": "6d9e79f9-e54f-4a3d-b09f-c10ef281b172",
   "source": "job/my-devops-project/job/my-multi-branch-pipeline/job/main/",
   "time": "2022-01-18T17:57:26.556+0800",

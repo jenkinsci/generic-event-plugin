@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.generic.event;
 
 import hudson.Extension;
 import jenkins.model.GlobalConfiguration;

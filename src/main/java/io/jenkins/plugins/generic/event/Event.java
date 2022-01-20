@@ -1,4 +1,4 @@
-package io.jenkins.plugins.pipeline.event;
+package io.jenkins.plugins.generic.event;
 
 import java.time.Instant;
 import java.util.Objects;

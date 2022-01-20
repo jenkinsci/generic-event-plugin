@@ -1,4 +1,9 @@
-package io.jenkins.plugins.pipeline.event.transformer;
+package io.jenkins.plugins.generic.event.transformer;
+
+import io.jenkins.plugins.generic.event.Event;
+import io.jenkins.plugins.generic.event.data.WorkflowRunData;
+import net.jodah.typetools.TypeResolver;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -7,18 +12,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.jenkins.plugins.pipeline.event.Event;
-import io.jenkins.plugins.pipeline.event.data.WorkflowRunData;
-
 /**
  * EventDataTransformers is a set of event data transformers and is responsible
  * for picking a proper transformer to transform an object. It also supports
  * transformer registering and unregistering.
- * 
+ * <p>
  * It's lazy-load and a singleton type.
- * 
+ *
  * @author johnniang
- * 
  */
 public enum EventDataTransformers {
 
@@ -28,7 +29,7 @@ public enum EventDataTransformers {
 
     EventDataTransformers() {
         this.transformers = new HashMap<>();
-        register(new WorkflowRunData.WorkflowRunTransformer());
+        register((EventDataTransformer<WorkflowRun>) WorkflowRunData::new);
         // TODO register other event data transformers.
     }
 
@@ -44,7 +45,7 @@ public enum EventDataTransformers {
         return Collections.unmodifiableCollection(transformers.values());
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void transform(Event event) {
         if (event == null || event.getData() == null) {
             return;
@@ -62,7 +63,7 @@ public enum EventDataTransformers {
     }
 
     private Type getActualArgumentType(EventDataTransformer<?> transformer) {
-        return ((ParameterizedType) transformer.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
+        return TypeResolver.resolveRawArgument(EventDataTransformer.class, transformer.getClass());
     }
 
 }

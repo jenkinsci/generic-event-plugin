@@ -1,10 +1,10 @@
-package io.jenkins.plugins.pipeline.event.data;
+package io.jenkins.plugins.generic.event.data;
 
+import io.jenkins.plugins.generic.event.transformer.EnhancedData;
+import jenkins.branch.MultiBranchProject;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-
-import io.jenkins.plugins.pipeline.event.transformer.EventDataTransformer;
-import jenkins.branch.MultiBranchProject;
+import org.kohsuke.stapler.export.Exported;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
  *
  * @author johnniang
  */
-public class WorkflowRunData {
+public class WorkflowRunData extends EnhancedData<WorkflowRun> {
 
     private String parentFullName;
 
@@ -21,8 +21,19 @@ public class WorkflowRunData {
 
     private boolean isMultiBranch;
 
-    private WorkflowRun run;
+    private final WorkflowRun run;
 
+    public WorkflowRunData(WorkflowRun run) {
+        this.run = run;
+        WorkflowJob project = run.getParent();
+        this.setProjectName(project.getName());
+        this.setParentFullName(project.getParent().getFullName());
+        if (project.getParent() instanceof MultiBranchProject) {
+            this.setMultiBranch(true);
+        }
+    }
+
+    @Exported(name = "_parentFullName")
     public String getParentFullName() {
         return parentFullName;
     }
@@ -31,6 +42,7 @@ public class WorkflowRunData {
         this.parentFullName = parentFullName;
     }
 
+    @Exported(name = "_projectName")
     public String getProjectName() {
         return projectName;
     }
@@ -39,20 +51,13 @@ public class WorkflowRunData {
         this.projectName = projectName;
     }
 
+    @Exported(name = "_multiBranch")
     public boolean isMultiBranch() {
         return isMultiBranch;
     }
 
     public void setMultiBranch(boolean isMultiBranch) {
         this.isMultiBranch = isMultiBranch;
-    }
-
-    public WorkflowRun getRun() {
-        return run;
-    }
-
-    public void setRun(WorkflowRun run) {
-        this.run = run;
     }
 
     @Override
@@ -79,21 +84,9 @@ public class WorkflowRunData {
                 '}';
     }
 
-    public static class WorkflowRunTransformer implements EventDataTransformer<WorkflowRun> {
-
-        @Override
-        public Object transform(WorkflowRun run) {
-            WorkflowRunData data = new WorkflowRunData();
-            data.setRun(run);
-            WorkflowJob project = run.getParent();
-            data.setProjectName(project.getName());
-            data.setParentFullName(project.getParent().getFullName());
-            if (project.getParent() instanceof MultiBranchProject) {
-                data.setMultiBranch(true);
-            }
-            return data;
-        }
-
+    @Override
+    public WorkflowRun getRaw() {
+        return run;
     }
 
 }
