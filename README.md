@@ -35,5 +35,5 @@ Please refer to [Developer Guide](docs/developer.md).
 
 ## LICENSE
 
-Licensed under Apache 2.0, see [LICENSE](LICENSE.md)
+Licensed under Apache 2.0, see [LICENSE](LICENSE)
 
