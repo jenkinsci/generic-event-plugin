@@ -7,10 +7,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
 public class InstantProcessorTest {
 
     private JsonConfig jsonConfig;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(InstantProcessor.DATE_FORMAT_STRING)
+            .withZone(ZoneId.systemDefault());
+
+    private String format(TemporalAccessor temporal) {
+        return formatter.format(temporal);
+    }
 
     @Before
     public void setUp() {
@@ -29,7 +39,8 @@ public class InstantProcessorTest {
         Instant time = Instant.parse("2022-01-14T06:49:30.00Z");
         InstantBean instant = new InstantBean(time);
         String instantJSON = JSONObject.fromObject(instant, jsonConfig).toString();
-        Assert.assertEquals("{\"times\":[],\"time\":\"2022-01-14T14:49:30.000+0800\"}", instantJSON);
+
+        Assert.assertEquals("{\"times\":[],\"time\":\""+format(time)+"\"}", instantJSON);
     }
 
     @Test
@@ -38,7 +49,7 @@ public class InstantProcessorTest {
         InstantBean instant = new InstantBean(time);
         instant.setTimes(new Instant[]{time});
         String instantJSON = JSONObject.fromObject(instant, jsonConfig).toString();
-        Assert.assertEquals("{\"times\":[\"2022-01-14T14:49:30.000+0800\"],\"time\":\"2022-01-14T14:49:30.000+0800\"}", instantJSON);
+        Assert.assertEquals("{\"times\":[\""+format(time)+"\"],\"time\":\""+format(time)+"\"}", instantJSON);
     }
 
     public static class InstantBean {

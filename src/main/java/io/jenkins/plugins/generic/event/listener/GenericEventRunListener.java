@@ -4,16 +4,17 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.listeners.RunListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
 
 @Extension
-public class RunListener extends hudson.model.listeners.RunListener<Run<?, ?>> {
+public class GenericEventRunListener extends RunListener<Run<?, ?>> {
 
     private EventSender eventSender;
 
-    public RunListener() {
+    public GenericEventRunListener() {
         this.setEventSender(new HttpEventSender());
     }
 

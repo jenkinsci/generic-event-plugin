@@ -70,7 +70,7 @@ public class RunListenerTest {
         JenkinsLocationConfiguration.get().setUrl(null);
 
         MockitoAnnotations.openMocks(this);
-        ExtensionList<RunListener> listeners = ExtensionList.lookup(RunListener.class);
+        ExtensionList<GenericEventRunListener> listeners = ExtensionList.lookup(GenericEventRunListener.class);
         listeners.forEach((listener) -> listener.setEventSender(mockSender));
     }
 

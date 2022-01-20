@@ -2,16 +2,17 @@ package io.jenkins.plugins.generic.event.listener;
 
 import hudson.Extension;
 import hudson.model.Item;
+import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
 
 @Extension
-public class ItemListener extends hudson.model.listeners.ItemListener {
+public class GenericEventItemListener extends ItemListener {
 
     private EventSender eventSender;
 
-    public ItemListener() {
+    public GenericEventItemListener() {
         this.setEventSender(new HttpEventSender());
     }
 
