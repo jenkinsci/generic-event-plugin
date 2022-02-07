@@ -7,6 +7,11 @@ import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
 
+/**
+ * This listener collects events about all items.
+ *
+ * @author johnniang
+ */
 @Extension
 public class GenericEventItemListener extends ItemListener {
 

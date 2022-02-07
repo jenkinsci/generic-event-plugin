@@ -2,11 +2,13 @@
 
 ## Introduction
 
-The Generic Event Plugin built for Jenkins is mainly to solve the interaction problem between the third-party system and Jenkins.
+The Generic Event Plugin built for Jenkins is mainly to solve the interaction problem between the third-party system and
+Jenkins.
 
 By using the plugin, the third-party system can receive the events it is interested in more quickly and respond quickly.
 
-At present, our event body mainly refers to CloudEvents, and CloudEvents specification may be supported in the future. We look forward to more people to push this goal.
+At present, our event body mainly refers to CloudEvents, and CloudEvents specification may be supported in the future.
+We look forward to more people to push this goal.
 
 ## Getting Started
 
@@ -22,12 +24,19 @@ Event Receiver
 The receiver that can receive the event fired by system.
 ```
 
-## Events Ducumentation
+## Events Documentation
 
-After the event receiver is configured, we can easily receive events from Jenkins. The following is the detailed document of the corresponding event:
+After the event receiver is configured, we can easily receive events from Jenkins. The following is the detailed
+document of the corresponding event:
 
-- [WorkflowRun Event](docs/workflowrun.md)
-- [WorkflowJob Event](docs/workflowjob.md)
+- [Run Event](docs/run.md)
+- [Job Event](docs/job.md)
+
+## TODOs
+
+- [ ] Send events asynchronously
+- [ ] Support custom filter to filter events
+- [ ] Collect more events
 
 ## Contributing
 
