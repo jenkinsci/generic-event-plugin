@@ -45,7 +45,7 @@
     "_parentFullName": "my-devops-project",
     "_projectName": "example-pipeline"
   },
-  "dataType": "io.jenkins.plugins.generic.event.data.WorkflowRunData",
+  "dataType": "org.jenkinsci.plugins.workflow.job.WorkflowRun",
   "id": "50c33b0e-d7f1-4a34-b57e-bb82cd453894",
   "source": "job/my-devops-project/job/example-pipeline/",
   "time": "2022-02-06T13:48:15.307+0800",
@@ -98,7 +98,7 @@
     "_parentFullName": "my-devops-project",
     "_projectName": "example-pipeline"
   },
-  "dataType": "io.jenkins.plugins.generic.event.data.WorkflowRunData",
+  "dataType": "org.jenkinsci.plugins.workflow.job.WorkflowRun",
   "id": "eb227ba6-9135-45ff-bec5-a28ccb587bb9",
   "source": "job/my-devops-project/job/example-pipeline/",
   "time": "2022-02-06T13:48:15.333+0800",
@@ -153,7 +153,7 @@
     "_parentFullName": "my-devops-project",
     "_projectName": "example-pipeline"
   },
-  "dataType": "io.jenkins.plugins.generic.event.data.WorkflowRunData",
+  "dataType": "org.jenkinsci.plugins.workflow.job.WorkflowRun",
   "id": "aaf73c16-574b-4c1b-a740-4494318a59d5",
   "source": "job/my-devops-project/job/example-pipeline/",
   "time": "2022-02-06T13:48:17.022+0800",
@@ -208,7 +208,7 @@
     "_parentFullName": "my-devops-project",
     "_projectName": "example-pipeline"
   },
-  "dataType": "io.jenkins.plugins.generic.event.data.WorkflowRunData",
+  "dataType": "org.jenkinsci.plugins.workflow.job.WorkflowRun",
   "id": "bc11e508-a3ee-4900-8864-2be30e1ffda5",
   "source": "job/my-devops-project/job/example-pipeline/",
   "time": "2022-02-06T13:48:17.055+0800",
@@ -263,7 +263,7 @@
     "_parentFullName": "my-devops-project",
     "_projectName": "example-pipeline"
   },
-  "dataType": "io.jenkins.plugins.generic.event.data.WorkflowRunData",
+  "dataType": "org.jenkinsci.plugins.workflow.job.WorkflowRun",
   "id": "af7e9187-c244-46ac-8e4c-15335f38550c",
   "source": "job/my-devops-project/job/example-pipeline/",
   "time": "2022-02-06T13:55:01.792+0800",
