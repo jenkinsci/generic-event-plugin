@@ -57,9 +57,6 @@ public enum EventDataTransformers {
         }
         Object transformedData = transformer.transform(event.getData());
         event.setData(transformedData);
-        if (transformedData != null) {
-            event.setDataType(transformedData.getClass().getName());
-        }
     }
 
     private Type getActualArgumentType(EventDataTransformer<?> transformer) {
