@@ -1,5 +1,6 @@
 package io.jenkins.plugins.generic.event;
 
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
@@ -70,7 +71,7 @@ public class HttpEventSender implements EventSender {
             httpClient.start();
         }
 
-        public void sendPost(String receiver, Event event, final FutureCallback<SimpleHttpResponse> callback) {
+        public Future<SimpleHttpResponse> sendPost(String receiver, Event event, final FutureCallback<SimpleHttpResponse> callback) {
 
             String eventJSON = JSONObject.fromObject(event, new EventJsonConfig()).toString(4);
 
@@ -79,7 +80,7 @@ public class HttpEventSender implements EventSender {
                     .setBody(eventJSON, ContentType.APPLICATION_JSON)
                     .build();
 
-            httpClient.execute(request, callback);
+            return httpClient.execute(request, callback);
         }
     }
 }
