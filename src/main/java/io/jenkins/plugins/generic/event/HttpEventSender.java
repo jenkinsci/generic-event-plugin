@@ -63,9 +63,10 @@ public class HttpEventSender implements EventSender {
     }
 
     static public class CustomCloseableHttpAsyncClient {
-        private final CloseableHttpAsyncClient httpClient;
 
-        {
+        private static final CloseableHttpAsyncClient httpClient;
+
+        static {
             PoolingAsyncClientConnectionManager cmb = PoolingAsyncClientConnectionManagerBuilder
                     .create()
                     .setMaxConnPerRoute(1)
@@ -76,8 +77,7 @@ public class HttpEventSender implements EventSender {
             httpClient = HttpAsyncClients.custom().setConnectionManager(cmb).build();
             httpClient.start();
         }
-
-        public Future<SimpleHttpResponse> sendPost(String receiver, Event event, final FutureCallback<SimpleHttpResponse> callback) {
+        public void sendPost(String receiver, Event event, final FutureCallback<SimpleHttpResponse> callback) {
 
             String eventJSON = JSONObject.fromObject(event, new EventJsonConfig()).toString(4);
 
@@ -86,7 +86,7 @@ public class HttpEventSender implements EventSender {
                     .setBody(eventJSON, ContentType.APPLICATION_JSON)
                     .build();
 
-            return httpClient.execute(request, callback);
+            httpClient.execute(request, callback);
         }
     }
 }
