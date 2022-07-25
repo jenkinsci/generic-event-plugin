@@ -3,6 +3,7 @@ package io.jenkins.plugins.generic.event;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
@@ -25,13 +26,18 @@ import org.apache.hc.core5.util.TimeValue;
 public class HttpEventSender implements EventSender {
 
     private final Logger logger = Logger.getLogger(HttpEventSender.class.getName());
-    CustomCloseableHttpAsyncClient myClient = new CustomCloseableHttpAsyncClient();
-
-    final String receiver = EventGlobalConfiguration.get().getReceiver();
+    private final CustomCloseableHttpAsyncClient myClient = new CustomCloseableHttpAsyncClient();
 
     @Override
     public void send(Event event) {
         EventDataTransformers.INSTANCE.transform(event);
+
+        final String receiver = EventGlobalConfiguration.get().getReceiver();
+
+        if (StringUtils.isBlank(receiver)) {
+            logger.info("Skipped event sending due to receiver URL not set");
+            return;
+        }
 
         try {
             new Thread(() -> myClient.sendPost(receiver, event, new FutureCallback<SimpleHttpResponse>() {
