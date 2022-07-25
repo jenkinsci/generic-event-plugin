@@ -40,7 +40,7 @@ public class HttpEventSender implements EventSender {
         }
 
         try {
-            new Thread(() -> myClient.sendPost(receiver, event, new FutureCallback<SimpleHttpResponse>() {
+            myClient.sendPost(receiver, event, new FutureCallback<SimpleHttpResponse>() {
                 @Override
                 public void completed(SimpleHttpResponse response) {
                     logger.info("Event send succeeded, response: " + response.getBodyText());
@@ -55,7 +55,7 @@ public class HttpEventSender implements EventSender {
                 public void cancelled() {
                     logger.info("Event send has been cancelled");
                 }
-            })).start();
+            });
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to send event to " + receiver, e);
         }
