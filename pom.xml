@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>generic-event</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>${changelist}</version>
     <packaging>hpi</packaging>
     <name>Generic Event Plugin</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
@@ -37,8 +37,7 @@
         <url>https://github.com/${gitHubRepo}</url>
     </scm>
     <properties>
-        <revision>0.0.4</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <changelist>999999-SNAPSHOT</changelist>
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.277.4</jenkins.version>
