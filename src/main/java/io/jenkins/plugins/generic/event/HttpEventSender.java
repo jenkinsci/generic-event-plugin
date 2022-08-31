@@ -84,6 +84,7 @@ public class HttpEventSender implements EventSender {
             SimpleHttpRequest request = SimpleRequestBuilder
                     .post(receiver)
                     .setBody(eventJSON, ContentType.APPLICATION_JSON)
+                    .addHeader("X-Event-Type", event.getType())
                     .build();
 
             httpClient.execute(request, callback);
