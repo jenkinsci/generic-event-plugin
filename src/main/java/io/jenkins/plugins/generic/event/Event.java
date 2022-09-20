@@ -17,7 +17,7 @@ public class Event {
 
     private String source;
 
-    private String sourceChild;
+    private String url;
 
     private String id;
 
@@ -30,7 +30,7 @@ public class Event {
     public Event(EventBuilder builder) {
         this.type = builder.type;
         this.source = builder.source;
-        this.sourceChild = builder.sourceChild;
+        this.url = builder.url;
         this.id = builder.id;
         this.time = builder.time;
         this.dataType = builder.dataType;
@@ -43,7 +43,7 @@ public class Event {
 
         private String source;
 
-        private String sourceChild;
+        private String url;
 
         private String id;
 
@@ -66,8 +66,8 @@ public class Event {
             return this;
         }
 
-        public EventBuilder sourceChild(String sourceChild) {
-            this.sourceChild = sourceChild;
+        public EventBuilder url(String url) {
+            this.url = url;
             return this;
         }
 
@@ -108,12 +108,12 @@ public class Event {
         this.source = source;
     }
 
-    public String getSourceChild() {
-        return sourceChild;
+    public String getUrl() {
+        return url;
     }
 
-    public void setSourceChild(String sourceChild) {
-        this.sourceChild = sourceChild;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getId() {
@@ -156,7 +156,7 @@ public class Event {
         Event event = (Event) o;
         return Objects.equals(type, event.type)
                 && Objects.equals(source, event.source)
-                && Objects.equals(sourceChild, event.sourceChild)
+                && Objects.equals(url, event.url)
                 && Objects.equals(id, event.id)
                 && Objects.equals(time, event.time)
                 && Objects.equals(dataType, event.dataType)
@@ -165,13 +165,13 @@ public class Event {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, source, sourceChild, id, time, dataType, data);
+        return Objects.hash(type, source, url, id, time, dataType, data);
     }
 
     @Override
     public String toString() {
         return "Event [data=" + data + ", dataType=" + dataType + ", id=" + id +
-                ", source=" + source + ", sourceChild=" + sourceChild + ", time=" + time
+                ", source=" + source + ", url=" + url + ", time=" + time
                 + ", type=" + type + "]";
     }
 }
