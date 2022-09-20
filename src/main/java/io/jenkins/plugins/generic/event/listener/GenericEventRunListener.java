@@ -27,6 +27,7 @@ public class GenericEventRunListener extends RunListener<Run<?, ?>> {
         eventSender.send(new Event.EventBuilder()
                 .type("run.completed")
                 .source(r.getParent().getUrl())
+                .sourceChild(r.getUrl())
                 .data(r)
                 .build());
     }
@@ -37,6 +38,7 @@ public class GenericEventRunListener extends RunListener<Run<?, ?>> {
         eventSender.send(new Event.EventBuilder()
                 .type("run.deleted")
                 .source(r.getParent().getUrl())
+                .sourceChild(r.getUrl())
                 .data(r)
                 .build());
     }
@@ -46,6 +48,7 @@ public class GenericEventRunListener extends RunListener<Run<?, ?>> {
         eventSender.send(new Event.EventBuilder()
                 .type("run.finalized")
                 .source(r.getParent().getUrl())
+                .sourceChild(r.getUrl())
                 .data(r)
                 .build());
     }
@@ -55,6 +58,7 @@ public class GenericEventRunListener extends RunListener<Run<?, ?>> {
         eventSender.send(new Event.EventBuilder()
                 .type("run.initialize")
                 .source(r.getParent().getUrl())
+                .sourceChild(r.getUrl())
                 .data(r)
                 .build());
     }
@@ -64,6 +68,7 @@ public class GenericEventRunListener extends RunListener<Run<?, ?>> {
         eventSender.send(new Event.EventBuilder()
                 .type("run.started")
                 .source(r.getParent().getUrl())
+                .sourceChild(r.getUrl())
                 .data(r)
                 .build());
     }

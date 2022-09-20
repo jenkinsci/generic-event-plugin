@@ -30,6 +30,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.created")
                 .source(item.getParent().getUrl())
+                .sourceChild(item.getUrl())
                 .data(item)
                 .build());
     }
@@ -39,6 +40,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.deleted")
                 .source(item.getParent().getUrl())
+                .sourceChild(item.getUrl())
                 .data(item)
                 .build());
     }
@@ -48,6 +50,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.updated")
                 .source(item.getParent().getUrl())
+                .sourceChild(item.getUrl())
                 .data(item)
                 .build());
     }
