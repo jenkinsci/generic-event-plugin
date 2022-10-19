@@ -3,6 +3,8 @@ package io.jenkins.plugins.generic.event;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
@@ -65,6 +67,7 @@ public class HttpEventSender implements EventSender {
     static public class CustomCloseableHttpAsyncClient {
 
         private static final CloseableHttpAsyncClient httpClient;
+        private static String rootUrl = null;
 
         static {
             PoolingAsyncClientConnectionManager cmb = PoolingAsyncClientConnectionManagerBuilder
@@ -76,6 +79,11 @@ public class HttpEventSender implements EventSender {
 
             httpClient = HttpAsyncClients.custom().setConnectionManager(cmb).build();
             httpClient.start();
+
+            Jenkins j = Jenkins.getInstanceOrNull();
+            if (j != null) {
+                rootUrl = j.getRootUrl();
+            }
         }
         public void sendPost(String receiver, Event event, final FutureCallback<SimpleHttpResponse> callback) {
 
@@ -85,6 +93,7 @@ public class HttpEventSender implements EventSender {
                     .post(receiver)
                     .setBody(eventJSON, ContentType.APPLICATION_JSON)
                     .addHeader("X-Event-Type", event.getType())
+                    .addHeader("Referrer", rootUrl)
                     .build();
 
             httpClient.execute(request, callback);

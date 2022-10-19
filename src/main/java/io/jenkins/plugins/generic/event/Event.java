@@ -17,6 +17,8 @@ public class Event {
 
     private String source;
 
+    private String url;
+
     private String id;
 
     private Instant time;
@@ -28,6 +30,7 @@ public class Event {
     public Event(EventBuilder builder) {
         this.type = builder.type;
         this.source = builder.source;
+        this.url = builder.url;
         this.id = builder.id;
         this.time = builder.time;
         this.dataType = builder.dataType;
@@ -39,6 +42,8 @@ public class Event {
         private String type;
 
         private String source;
+
+        private String url;
 
         private String id;
 
@@ -58,6 +63,11 @@ public class Event {
 
         public EventBuilder source(String source) {
             this.source = source;
+            return this;
+        }
+
+        public EventBuilder url(String url) {
+            this.url = url;
             return this;
         }
 
@@ -98,6 +108,14 @@ public class Event {
         this.source = source;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public String getId() {
         return id;
     }
@@ -136,19 +154,24 @@ public class Event {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(type, event.type) && Objects.equals(source, event.source) && Objects.equals(id, event.id)
-                && Objects.equals(time, event.time) && Objects.equals(dataType, event.dataType)
+        return Objects.equals(type, event.type)
+                && Objects.equals(source, event.source)
+                && Objects.equals(url, event.url)
+                && Objects.equals(id, event.id)
+                && Objects.equals(time, event.time)
+                && Objects.equals(dataType, event.dataType)
                 && Objects.equals(data, event.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, source, id, time, dataType, data);
+        return Objects.hash(type, source, url, id, time, dataType, data);
     }
 
     @Override
     public String toString() {
-        return "Event [data=" + data + ", dataType=" + dataType + ", id=" + id + ", source=" + source + ", time=" + time
+        return "Event [data=" + data + ", dataType=" + dataType + ", id=" + id +
+                ", source=" + source + ", url=" + url + ", time=" + time
                 + ", type=" + type + "]";
     }
 }
