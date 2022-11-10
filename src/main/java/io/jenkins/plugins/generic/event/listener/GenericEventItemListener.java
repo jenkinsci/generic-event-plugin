@@ -54,4 +54,16 @@ public class GenericEventItemListener extends ItemListener {
                 .data(item)
                 .build());
     }
+
+    @Override
+    public void onLocationChanged(Item item, String oldName, String newName) {
+        eventSender.send(new Event.EventBuilder()
+                .type("item.locationChanged")
+                .source(item.getParent().getUrl())
+                .url(item.getUrl())
+                .data(item)
+                .oldName(oldName)
+                .newName(newName)
+                .build());
+    }
 }

@@ -27,6 +27,10 @@ public class Event {
 
     private Object data;
 
+    private String oldName;
+
+    private String newName;
+
     public Event(EventBuilder builder) {
         this.type = builder.type;
         this.source = builder.source;
@@ -35,6 +39,8 @@ public class Event {
         this.time = builder.time;
         this.dataType = builder.dataType;
         this.data = builder.data;
+        this.oldName = builder.oldName;
+        this.newName = builder.newName;
     }
 
     public static class EventBuilder {
@@ -52,6 +58,10 @@ public class Event {
         private String dataType;
 
         private Object data;
+
+        private String oldName;
+
+        private String newName;
 
         public EventBuilder() {
         }
@@ -78,6 +88,16 @@ public class Event {
 
         public EventBuilder data(Object data) {
             this.data = data;
+            return this;
+        }
+
+        public EventBuilder oldName(String oldName) {
+            this.oldName = oldName;
+            return this;
+        }
+
+        public EventBuilder newName(String newName) {
+            this.newName = newName;
             return this;
         }
 
@@ -148,6 +168,21 @@ public class Event {
         this.data = data;
     }
 
+    public String getOldName() {
+        return oldName;
+    }
+
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
+    }
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public void setNewName(String newName) {
+        this.newName = newName;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -160,18 +195,20 @@ public class Event {
                 && Objects.equals(id, event.id)
                 && Objects.equals(time, event.time)
                 && Objects.equals(dataType, event.dataType)
-                && Objects.equals(data, event.data);
+                && Objects.equals(data, event.data)
+                && Objects.equals(oldName, event.oldName)
+                && Objects.equals(newName, event.newName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, source, url, id, time, dataType, data);
+        return Objects.hash(type, source, url, id, time, dataType, data, oldName, newName);
     }
 
     @Override
     public String toString() {
         return "Event [data=" + data + ", dataType=" + dataType + ", id=" + id +
                 ", source=" + source + ", url=" + url + ", time=" + time
-                + ", type=" + type + "]";
+                + ", oldName=" + oldName + ", newName=" + newName + ", type=" + type + "]";
     }
 }
