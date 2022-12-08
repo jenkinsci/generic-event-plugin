@@ -1,11 +1,16 @@
 package io.jenkins.plugins.generic.event.listener;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Item;
 import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
+import io.jenkins.plugins.generic.event.MetaData;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * This listener collects events about all items.
@@ -62,8 +67,33 @@ public class GenericEventItemListener extends ItemListener {
                 .source(item.getParent().getUrl())
                 .url(item.getUrl())
                 .data(item)
-                .oldName(oldName)
-                .newName(newName)
+                .metaData(new MetaData.MetaDataBuilder()
+                        .oldName(oldName)
+                        .newName(newName)
+                        .oldUrl(item.getUrl())
+                        .newUrl(item.getUrl())
+                        .build())
                 .build());
+    }
+
+    @Override
+    public void onRenamed(Item item, String oldName, String newName) {
+
+
+
+
+        eventSender.send(new Event.EventBuilder()
+                .type("item.renamed")
+                .source(item.getParent().getUrl())
+                .data(item)
+                .metaData(new MetaData.MetaDataBuilder()
+                        .oldName(oldName)
+                        .newName(newName)
+                        .oldUrl(item.getUrl())
+                        .newUrl(item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(item.getName()) + '/')
+                        .build())
+                .build());
+
+
     }
 }

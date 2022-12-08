@@ -26,10 +26,7 @@ public class Event {
     private String dataType;
 
     private Object data;
-
-    private String oldName;
-
-    private String newName;
+    private Object metaData;
 
     public Event(EventBuilder builder) {
         this.type = builder.type;
@@ -39,8 +36,7 @@ public class Event {
         this.time = builder.time;
         this.dataType = builder.dataType;
         this.data = builder.data;
-        this.oldName = builder.oldName;
-        this.newName = builder.newName;
+        this.metaData = builder.metaData;
     }
 
     public static class EventBuilder {
@@ -59,9 +55,7 @@ public class Event {
 
         private Object data;
 
-        private String oldName;
-
-        private String newName;
+        private Object metaData;
 
         public EventBuilder() {
         }
@@ -91,13 +85,8 @@ public class Event {
             return this;
         }
 
-        public EventBuilder oldName(String oldName) {
-            this.oldName = oldName;
-            return this;
-        }
-
-        public EventBuilder newName(String newName) {
-            this.newName = newName;
+        public EventBuilder metaData(MetaData metaData) {
+            this.metaData = metaData;
             return this;
         }
 
@@ -168,22 +157,6 @@ public class Event {
         this.data = data;
     }
 
-    public String getOldName() {
-        return oldName;
-    }
-
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
-    }
-
-    public String getNewName() {
-        return newName;
-    }
-
-    public void setNewName(String newName) {
-        this.newName = newName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -195,20 +168,17 @@ public class Event {
                 && Objects.equals(id, event.id)
                 && Objects.equals(time, event.time)
                 && Objects.equals(dataType, event.dataType)
-                && Objects.equals(data, event.data)
-                && Objects.equals(oldName, event.oldName)
-                && Objects.equals(newName, event.newName);
+                && Objects.equals(data, event.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, source, url, id, time, dataType, data, oldName, newName);
+        return Objects.hash(type, source, url, id, time, dataType, data);
     }
 
     @Override
     public String toString() {
         return "Event [data=" + data + ", dataType=" + dataType + ", id=" + id +
-                ", source=" + source + ", url=" + url + ", time=" + time
-                + ", oldName=" + oldName + ", newName=" + newName + ", type=" + type + "]";
+                ", source=" + source + ", url=" + url + ", time=" + time + ", type=" + type + "]";
     }
 }
