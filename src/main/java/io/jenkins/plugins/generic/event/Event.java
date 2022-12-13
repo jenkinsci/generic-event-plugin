@@ -26,7 +26,7 @@ public class Event {
     private String dataType;
 
     private Object data;
-    private Object metaData;
+    private MetaData metaData;
 
     public Event(EventBuilder builder) {
         this.type = builder.type;
@@ -55,7 +55,7 @@ public class Event {
 
         private Object data;
 
-        private Object metaData;
+        private MetaData metaData;
 
         public EventBuilder() {
         }
@@ -155,6 +155,14 @@ public class Event {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public MetaData getMetaData() {
+        return metaData;
+    }
+
+    public void setMetaData(MetaData metaData) {
+        this.metaData = metaData;
     }
 
     @Override

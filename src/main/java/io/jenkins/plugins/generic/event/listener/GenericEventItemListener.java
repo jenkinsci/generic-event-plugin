@@ -50,15 +50,15 @@ public class GenericEventItemListener extends ItemListener {
                 .build());
     }
 
-    @Override
-    public void onUpdated(Item item) {
-        eventSender.send(new Event.EventBuilder()
-                .type("item.updated")
-                .source(item.getParent().getUrl())
-                .url(item.getUrl())
-                .data(item)
-                .build());
-    }
+//    @Override
+//    public void onUpdated(Item item) {
+//        eventSender.send(new Event.EventBuilder()
+//                .type("item.updated")
+//                .source(item.getParent().getUrl())
+//                .url(item.getUrl())
+//                .data(item)
+//                .build());
+//    }
 
     @Override
     public void onLocationChanged(Item item, String oldName, String newName) {
@@ -68,32 +68,28 @@ public class GenericEventItemListener extends ItemListener {
                 .url(item.getUrl())
                 .data(item)
                 .metaData(new MetaData.MetaDataBuilder()
-                        .oldName(oldName)
-                        .newName(newName)
-                        .oldUrl(item.getUrl())
-                        .newUrl(item.getUrl())
-                        .build())
-                .build());
-    }
-
-    @Override
-    public void onRenamed(Item item, String oldName, String newName) {
-
-
-
-
-        eventSender.send(new Event.EventBuilder()
-                .type("item.renamed")
-                .source(item.getParent().getUrl())
-                .data(item)
-                .metaData(new MetaData.MetaDataBuilder()
-                        .oldName(oldName)
-                        .newName(newName)
+                        .oldName(oldName)  // todo Отделить папку от названия сборки
+                        .newName(item.getName())
                         .oldUrl(item.getUrl())
                         .newUrl(item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(item.getName()) + '/')
                         .build())
                 .build());
-
-
     }
+
+//    @Override
+//    public void onRenamed(Item item, String oldName, String newName) {
+//        eventSender.send(new Event.EventBuilder()
+//                .type("item.renamed")
+//                .source(item.getParent().getUrl())
+//                .data(item)
+//                .metaData(new MetaData.MetaDataBuilder()
+//                        .oldName(oldName)
+//                        .newName(newName)
+//                        .oldUrl(item.getUrl())
+//                        .newUrl(item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(item.getName()) + '/')
+//                        .build())
+//                .build());
+//
+//
+//    }
 }

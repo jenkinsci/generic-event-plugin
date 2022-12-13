@@ -70,4 +70,20 @@ public class MetaData {
     public void setNewName(String newName) {
         this.newName = newName;
     }
+
+    public String getOldUrl() {
+        return oldUrl;
+    }
+
+    public void setOldUrl(String oldUrl) {
+        this.oldUrl = oldUrl;
+    }
+
+    public String getNewUrl() {
+        return newUrl;
+    }
+
+    public void setNewUrl(String newUrl) {
+        this.newUrl = newUrl;
+    }
 }
