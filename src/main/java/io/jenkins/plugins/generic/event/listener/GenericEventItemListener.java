@@ -30,6 +30,12 @@ public class GenericEventItemListener extends ItemListener {
         this.eventSender = eventSender;
     }
 
+    public String getItemNewUrlOnLocationChanged(Item item) {
+        return item.getParent().getUrl() +
+                item.getParent().getUrlChildPrefix() + '/' +
+                Util.rawEncode(item.getName()) + '/';
+    }
+
     @Override
     public void onCreated(Item item) {
         eventSender.send(new Event.EventBuilder()
@@ -71,7 +77,7 @@ public class GenericEventItemListener extends ItemListener {
                         .oldName(oldFullName)
                         .newName(newFullName)
                         .oldUrl(item.getUrl())
-                        .newUrl(item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(item.getName()) + '/')
+                        .newUrl(this.getItemNewUrlOnLocationChanged(item))
                         .build())
                 .build());
     }
