@@ -30,10 +30,23 @@ public class GenericEventItemListener extends ItemListener {
         this.eventSender = eventSender;
     }
 
-    public String getItemNewUrlOnLocationChanged(Item item) {
+    public String getCanonicalItemUrl(Item item) {
         return item.getParent().getUrl() +
                 item.getParent().getUrlChildPrefix() + '/' +
-                Util.rawEncode(item.getName()) + '/';
+                item.getName() + '/';
+    }
+
+    public String getCanonicalItemOldUrl(Item item, String oldFullName) {
+        String oldName = oldFullName.substring(oldFullName.lastIndexOf('/') + 1);
+        return item.getParent().getUrl() +
+                item.getParent().getUrlChildPrefix() + '/' +
+                oldName + '/';
+    }
+    public String getCanonicalItemNewUrl(Item item, String newFullName) {
+        String newName = newFullName.substring(newFullName.lastIndexOf('/') + 1);
+        return item.getParent().getUrl() +
+                item.getParent().getUrlChildPrefix() + '/' +
+                newName + '/';
     }
 
     @Override
@@ -41,7 +54,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.created")
                 .source(item.getParent().getUrl())
-                .url(item.getUrl())
+                .url(this.getCanonicalItemUrl(item))
                 .data(item)
                 .build());
     }
@@ -76,8 +89,8 @@ public class GenericEventItemListener extends ItemListener {
                 .metaData(new MetaData.MetaDataBuilder()
                         .oldName(oldFullName)
                         .newName(newFullName)
-                        .oldUrl(item.getUrl())
-                        .newUrl(this.getItemNewUrlOnLocationChanged(item))
+                        .oldUrl(this.getCanonicalItemOldUrl(item, oldFullName))
+                        .newUrl(this.getCanonicalItemNewUrl(item, newFullName))
                         .build())
                 .build());
     }
