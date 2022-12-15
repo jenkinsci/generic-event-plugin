@@ -1,7 +1,10 @@
 package io.jenkins.plugins.generic.event.listener;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
+import com.cloudbees.hudson.plugins.folder.relocate.DefaultRelocationUI;
+import com.cloudbees.hudson.plugins.folder.relocate.RelocationAction;
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.*;
 import hudson.model.listeners.ItemListener;
 import hudson.security.AccessControlled;
@@ -42,8 +45,6 @@ public class GenericEventItemListener extends ItemListener {
     }
 
     public String getCanonicalItemUrl(Item item, String fullName) {
-        List<String> addBuf = new ArrayList<>();
-        List<String> removeBuf = new ArrayList<>();
         StringBuffer resultUrl = new StringBuffer();
 
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
@@ -54,25 +55,27 @@ public class GenericEventItemListener extends ItemListener {
                 continue;
             }
             else if (o instanceof View) {
-                String urlToRemove = ((View) o).getUrl();
-                removeBuf.add(urlToRemove);
+//                String urlToRemove = ((View) o).getUrl();
+                continue;
             }
             else if (o instanceof Folder) {
                 String urlToAdd = ((Folder) o).getName();
-                addBuf.add("job");
-                addBuf.add(urlToAdd);
                 resultUrl.append("job/");
-                resultUrl.append(urlToAdd);
+                resultUrl.append(Util.rawEncode(urlToAdd));
             }
             else if (o instanceof Project) {
                 continue;
+            }
+            else if (o instanceof Action) {
+                continue;
+            }
+            else if (o instanceof DefaultRelocationUI) {
+                continue;
             } else {
                 String urlToAdd = ((View) o).getUrl();
-                addBuf.add(tmpUrl);
-                resultUrl.append(urlToAdd);
+                resultUrl.append(Util.rawEncode(urlToAdd));
             }
 
-            addBuf.add("/");
             resultUrl.append("/");
         }
 
@@ -80,7 +83,7 @@ public class GenericEventItemListener extends ItemListener {
             resultUrl.append("job/");
         }
 
-        String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
+        String jobName = Util.rawEncode(fullName.substring(fullName.lastIndexOf('/') + 1));
         return resultUrl + jobName + "/";
 //        return item.getParent().getUrl() +
 //                item.getParent().getUrlChildPrefix() + '/' +
