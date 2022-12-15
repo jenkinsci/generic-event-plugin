@@ -2,25 +2,17 @@ package io.jenkins.plugins.generic.event.listener;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.cloudbees.hudson.plugins.folder.relocate.DefaultRelocationUI;
-import com.cloudbees.hudson.plugins.folder.relocate.RelocationAction;
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.*;
 import hudson.model.listeners.ItemListener;
-import hudson.security.AccessControlled;
-import hudson.util.Iterators;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
 import io.jenkins.plugins.generic.event.MetaData;
-import jenkins.model.Jenkins;
 import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.Stapler;
-import hudson.Functions;
-import org.kohsuke.stapler.StaplerRequest;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,12 +43,10 @@ public class GenericEventItemListener extends ItemListener {
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
         for (Ancestor anc : ancs) {
             Object o = anc.getObject();
-            String tmpUrl = anc.getUrl();
             if (o instanceof Hudson) {
                 continue;
             }
             else if (o instanceof View) {
-//                String urlToRemove = ((View) o).getUrl();
                 continue;
             }
             else if (o instanceof Folder) {
@@ -85,11 +75,7 @@ public class GenericEventItemListener extends ItemListener {
         }
 
         String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
-//        String oldResultUrl = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + jobName + '/';
-        String oldResultUrl = resultUrl + Util.rawEncode(jobName) + "/";
-//        String oldResultUrl = resultUrl + jobName + "/";
-
-        return oldResultUrl;
+        return resultUrl + Util.rawEncode(jobName) + "/";
     }
 
     public String getCanonicalItemNewUrl(Item item, String newFullName) {
