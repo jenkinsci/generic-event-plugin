@@ -83,11 +83,72 @@ public class GenericEventItemListener extends ItemListener {
             resultUrl.append("job/");
         }
 
-        String jobName = Util.rawEncode(fullName.substring(fullName.lastIndexOf('/') + 1));
-        return resultUrl + jobName + "/";
-//        return item.getParent().getUrl() +
-//                item.getParent().getUrlChildPrefix() + '/' +
-//                jobName + '/';
+        String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
+//        String oldResultUrl = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + jobName + '/';
+        String oldResultUrl = resultUrl + jobName + "/";
+
+        return Util.rawEncode(oldResultUrl);
+    }
+
+    public String getCanonicalItemNewUrl(Item item, String oldFullName, String newFullName) {
+        StringBuffer resultUrl = new StringBuffer();
+        List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
+        List<String> tokens = new ArrayList<>();
+
+
+        for (Ancestor anc : ancs) {
+            Object o = anc.getObject();
+            String tmpUrl = anc.getUrl();
+            if (o instanceof Hudson) {
+                continue;
+            }
+            else if (o instanceof View) {
+//                String urlToRemove = ((View) o).getUrl();
+                continue;
+            }
+            else if (o instanceof Folder) {
+                String urlToAdd = ((Folder) o).getName();
+                tokens.add("job/");
+                resultUrl.append("job/");
+//                resultUrl.append(Util.rawEncode(urlToAdd));
+                resultUrl.append(urlToAdd);
+                tokens.add(urlToAdd);
+            }
+            else if (o instanceof Project) {
+                continue;
+            }
+            else if (o instanceof Action) {
+                continue;
+            }
+            else if (o instanceof DefaultRelocationUI) {
+                continue;
+            } else {
+                String urlToAdd = ((View) o).getUrl();
+//                resultUrl.append(Util.rawEncode(urlToAdd));
+                resultUrl.append(urlToAdd);
+                tokens.add(urlToAdd);
+            }
+
+            resultUrl.append("/");
+            tokens.add("/");
+        }
+
+        if (item instanceof Project) {
+            resultUrl.append("job/");
+            tokens.add("job/");
+        }
+
+//        String jobName = Util.rawEncode(newFullName.substring(newFullName.lastIndexOf('/') + 1));
+        String oldFolder = oldFullName.split("/")[0];
+        String newFolder = newFullName.split("/")[0];
+        String jobName = newFullName.substring(newFullName.lastIndexOf('/') + 1);
+//        String oldResultUrl = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + jobName + '/';
+        String oldResultUrl = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + jobName + '/';
+        String newJobUrl = resultUrl + jobName + "/";
+
+        String oldResultUrlEncoded = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
+        return oldResultUrlEncoded;
+//        return Util.rawEncode(newJobUrl);
     }
 
     @Override
@@ -130,7 +191,7 @@ public class GenericEventItemListener extends ItemListener {
                         .oldName(oldFullName)
                         .newName(newFullName)
                         .oldUrl(this.getCanonicalItemUrl(item, oldFullName))
-                        .newUrl(this.getCanonicalItemUrl(item, newFullName))
+                        .newUrl(this.getCanonicalItemNewUrl(item, oldFullName, newFullName))
                         .build())
                 .build());
     }
