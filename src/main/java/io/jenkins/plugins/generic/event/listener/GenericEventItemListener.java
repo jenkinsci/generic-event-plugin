@@ -1,12 +1,23 @@
 package io.jenkins.plugins.generic.event.listener;
 
+import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.Extension;
-import hudson.model.Item;
+import hudson.model.*;
 import hudson.model.listeners.ItemListener;
+import hudson.security.AccessControlled;
+import hudson.util.Iterators;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
 import io.jenkins.plugins.generic.event.MetaData;
+import jenkins.model.Jenkins;
+import org.kohsuke.stapler.Ancestor;
+import org.kohsuke.stapler.Stapler;
+import hudson.Functions;
+import org.kohsuke.stapler.StaplerRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This listener collects events about all items.
@@ -31,10 +42,49 @@ public class GenericEventItemListener extends ItemListener {
     }
 
     public String getCanonicalItemUrl(Item item, String fullName) {
-        String name = fullName.substring(fullName.lastIndexOf('/') + 1);
-        return item.getParent().getUrl() +
-                item.getParent().getUrlChildPrefix() + '/' +
-                name + '/';
+        List<String> addBuf = new ArrayList<>();
+        List<String> removeBuf = new ArrayList<>();
+        StringBuffer resultUrl = new StringBuffer();
+
+        List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
+        for (Ancestor anc : ancs) {
+            Object o = anc.getObject();
+            String tmpUrl = anc.getUrl();
+            if (o instanceof Hudson) {
+                continue;
+            }
+            else if (o instanceof View) {
+                String urlToRemove = ((View) o).getUrl();
+                removeBuf.add(urlToRemove);
+            }
+            else if (o instanceof Folder) {
+                String urlToAdd = ((Folder) o).getName();
+                addBuf.add("job");
+                addBuf.add(urlToAdd);
+                resultUrl.append("job/");
+                resultUrl.append(urlToAdd);
+            }
+            else if (o instanceof Project) {
+                continue;
+            } else {
+                String urlToAdd = ((View) o).getUrl();
+                addBuf.add(tmpUrl);
+                resultUrl.append(urlToAdd);
+            }
+
+            addBuf.add("/");
+            resultUrl.append("/");
+        }
+
+        if (item instanceof Project) {
+            resultUrl.append("job/");
+        }
+
+        String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
+        return resultUrl + jobName + "/";
+//        return item.getParent().getUrl() +
+//                item.getParent().getUrlChildPrefix() + '/' +
+//                jobName + '/';
     }
 
     @Override
