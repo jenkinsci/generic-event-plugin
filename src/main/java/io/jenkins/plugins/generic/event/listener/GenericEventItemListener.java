@@ -20,6 +20,7 @@ import hudson.Functions;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -85,9 +86,10 @@ public class GenericEventItemListener extends ItemListener {
 
         String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
 //        String oldResultUrl = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + jobName + '/';
-        String oldResultUrl = resultUrl + jobName + "/";
+        String oldResultUrl = resultUrl + Util.rawEncode(jobName) + "/";
+//        String oldResultUrl = resultUrl + jobName + "/";
 
-        return Util.rawEncode(oldResultUrl);
+        return oldResultUrl;
     }
 
     public String getCanonicalItemNewUrl(Item item, String oldFullName, String newFullName) {
@@ -146,7 +148,27 @@ public class GenericEventItemListener extends ItemListener {
         String oldResultUrl = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + jobName + '/';
         String newJobUrl = resultUrl + jobName + "/";
 
-        String oldResultUrlEncoded = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
+//        String oldResultUrlEncoded = item.getParent().getUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
+//        String oldResultUrlEncoded = ((AbstractItem) item.getParent()).getShortUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
+//        String oldResultUrlEncoded = ((AbstractItem) item.getParent()).getShortUrl() + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
+
+        List<String> urls_list = new ArrayList<>();
+//        StringBuffer parentUrlBuffer = new StringBuffer();
+        AbstractItem _item = (AbstractItem) item;
+        while (_item.getParent() != null) {
+            if (_item.getParent() instanceof Hudson) {
+                break;
+            }
+            String _url = ((AbstractItem) _item.getParent()).getShortUrl();
+//            parentUrlBuffer.append(_url);
+            urls_list.add(0, _url);
+//            urls_list.add(_url);
+            _item = (AbstractItem) _item.getParent();
+        }
+
+//        Collections.reverse(urls_list);
+        String parentUrl = String.join("", urls_list);
+        String oldResultUrlEncoded = parentUrl + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
         return oldResultUrlEncoded;
 //        return Util.rawEncode(newJobUrl);
     }
