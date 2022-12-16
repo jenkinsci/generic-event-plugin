@@ -38,44 +38,35 @@ public class GenericEventItemListener extends ItemListener {
     }
 
     public String getCanonicalItemUrl(Item item, String fullName) {
-        StringBuffer resultUrl = new StringBuffer();
+        StringBuilder resultUrl = new StringBuilder();
 
+        // todo rename folder event
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
         for (Ancestor anc : ancs) {
             Object o = anc.getObject();
-            if (o instanceof Hudson) {
-                continue;
-            }
-            else if (o instanceof View) {
-                continue;
-            }
-            else if (o instanceof Folder) {
+            if (o instanceof Folder) {
                 String urlToAdd = ((Folder) o).getName();
                 resultUrl.append("job/");
                 resultUrl.append(Util.rawEncode(urlToAdd));
+                resultUrl.append("/");
             }
-            else if (o instanceof Project) {
-                continue;
-            }
-            else if (o instanceof Action) {
-                continue;
-            }
-            else if (o instanceof DefaultRelocationUI) {
-                continue;
-            } else {
-                String urlToAdd = ((View) o).getUrl();
-                resultUrl.append(Util.rawEncode(urlToAdd));
-            }
-
-            resultUrl.append("/");
         }
 
         if (item instanceof Project) {
             resultUrl.append("job/");
         }
 
-        String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
-        return resultUrl + Util.rawEncode(jobName) + "/";
+
+        if (!(item instanceof Folder)) {
+            String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
+            resultUrl.append(Util.rawEncode(jobName));
+            resultUrl.append("/");
+        } else {
+            String folderName = fullName.substring(fullName.lastIndexOf('/') + 1);
+            resultUrl.append(Util.rawEncode(folderName));
+        }
+
+        return resultUrl.toString();
     }
 
     public String getCanonicalItemNewUrl(Item item, String newFullName) {
