@@ -12,6 +12,8 @@ import io.jenkins.plugins.generic.event.HttpEventSender;
 import io.jenkins.plugins.generic.event.MetaData;
 import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +43,14 @@ public class GenericEventItemListener extends ItemListener {
         StringBuilder resultUrl = new StringBuilder();
 
         // todo rename folder event
+        StaplerRequest req = Stapler.getCurrentRequest();
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
         for (Ancestor anc : ancs) {
+            if (anc.equals(ancs.get(ancs.size()-1)) &&
+                    Stapler.getCurrentRequest().getOriginalRequestURI().endsWith("confirmRename")) {
+                continue;
+            }
+
             Object o = anc.getObject();
             if (o instanceof Folder) {
                 String urlToAdd = ((Folder) o).getName();
@@ -52,17 +60,19 @@ public class GenericEventItemListener extends ItemListener {
             }
         }
 
-        if (item instanceof Project) {
-            resultUrl.append("job/");
-        }
+//        if (item instanceof Project) {
+//            resultUrl.append("job/");
+//        }
 
 
         if (!(item instanceof Folder)) {
             String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
+            resultUrl.append("job/");
             resultUrl.append(Util.rawEncode(jobName));
             resultUrl.append("/");
         } else {
             String folderName = fullName.substring(fullName.lastIndexOf('/') + 1);
+            resultUrl.append("job/");
             resultUrl.append(Util.rawEncode(folderName));
         }
 
