@@ -41,14 +41,13 @@ public class GenericEventItemListener extends ItemListener {
 
     public String getCanonicalItemUrl(Item item, String fullName) {
         StringBuilder resultUrl = new StringBuilder();
-
-        // todo rename folder event
-        StaplerRequest req = Stapler.getCurrentRequest();
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
         for (Ancestor anc : ancs) {
-            if (anc.equals(ancs.get(ancs.size()-1)) &&
-                    Stapler.getCurrentRequest().getOriginalRequestURI().endsWith("confirmRename")) {
-                continue;
+            if (anc.equals(ancs.get(ancs.size()-1))) {
+                String uri = Stapler.getCurrentRequest().getOriginalRequestURI();
+                if (uri.endsWith("confirmRename") || uri.endsWith("configSubmit")) {
+                    continue;
+                }
             }
 
             Object o = anc.getObject();
@@ -60,21 +59,10 @@ public class GenericEventItemListener extends ItemListener {
             }
         }
 
-//        if (item instanceof Project) {
-//            resultUrl.append("job/");
-//        }
-
-
-        if (!(item instanceof Folder)) {
-            String jobName = fullName.substring(fullName.lastIndexOf('/') + 1);
-            resultUrl.append("job/");
-            resultUrl.append(Util.rawEncode(jobName));
-            resultUrl.append("/");
-        } else {
-            String folderName = fullName.substring(fullName.lastIndexOf('/') + 1);
-            resultUrl.append("job/");
-            resultUrl.append(Util.rawEncode(folderName));
-        }
+        String entityName = fullName.substring(fullName.lastIndexOf('/') + 1);
+        resultUrl.append("job/");
+        resultUrl.append(Util.rawEncode(entityName));
+        resultUrl.append("/");
 
         return resultUrl.toString();
     }
