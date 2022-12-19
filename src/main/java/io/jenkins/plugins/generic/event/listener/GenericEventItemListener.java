@@ -1,7 +1,6 @@
 package io.jenkins.plugins.generic.event.listener;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
-import com.cloudbees.hudson.plugins.folder.relocate.DefaultRelocationUI;
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.*;
@@ -12,7 +11,6 @@ import io.jenkins.plugins.generic.event.HttpEventSender;
 import io.jenkins.plugins.generic.event.MetaData;
 import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +33,17 @@ public class GenericEventItemListener extends ItemListener {
         this.eventSender = eventSender;
     }
 
-    public String getCanonicalItemUrl(Item item) {
-        return this.getCanonicalItemUrl(item, item.getName());
-    }
+    /**
+     * Normalizes url for canonical representation
+     *  <blockquote><pre>
+     *      view/myView/job/folder/job/taskName/
+     *      ->
+     *      job/folder/job/taskName/
+     *      </pre></blockquote>
+     * @param fullName Project name
+     */
+    public String getCanonicalEventUrl(String fullName) {
 
-    public String getCanonicalItemUrl(Item item, String fullName) {
         StringBuilder resultUrl = new StringBuilder();
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
         for (Ancestor anc : ancs) {
@@ -67,7 +71,7 @@ public class GenericEventItemListener extends ItemListener {
         return resultUrl.toString();
     }
 
-    public String getCanonicalItemNewUrl(Item item, String newFullName) {
+    public String getCanonicalEventUrlNewLocation(Item item, String newFullName) {
 
         String jobName = newFullName.substring(newFullName.lastIndexOf('/') + 1);
         List<String> urls_list = new ArrayList<>();
@@ -89,7 +93,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.created")
                 .source(item.getParent().getUrl())
-                .url(this.getCanonicalItemUrl(item))
+                .url(this.getCanonicalEventUrl(item.getName()))
                 .data(item)
                 .build());
     }
@@ -99,7 +103,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.deleted")
                 .source(item.getParent().getUrl())
-                .url(this.getCanonicalItemUrl(item))
+                .url(this.getCanonicalEventUrl(item.getName()))
                 .data(item)
                 .build());
     }
@@ -109,7 +113,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.updated")
                 .source(item.getParent().getUrl())
-                .url(this.getCanonicalItemUrl(item))
+                .url(this.getCanonicalEventUrl(item.getName()))
                 .data(item)
                 .build());
     }
@@ -123,8 +127,8 @@ public class GenericEventItemListener extends ItemListener {
                 .metaData(new MetaData.MetaDataBuilder()
                         .oldName(oldFullName)
                         .newName(newFullName)
-                        .oldUrl(this.getCanonicalItemUrl(item, oldFullName))
-                        .newUrl(this.getCanonicalItemNewUrl(item, newFullName))
+                        .oldUrl(this.getCanonicalEventUrl(oldFullName))
+                        .newUrl(this.getCanonicalEventUrlNewLocation(item, newFullName))
                         .build())
                 .build());
     }
