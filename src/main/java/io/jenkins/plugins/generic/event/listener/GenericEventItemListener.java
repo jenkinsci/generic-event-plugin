@@ -35,11 +35,11 @@ public class GenericEventItemListener extends ItemListener {
 
     /**
      * Normalizes url for canonical representation
-     *  <blockquote><pre>
-     *      view/myView/job/folder/job/taskName/
-     *      ->
-     *      job/folder/job/taskName/
-     *      </pre></blockquote>
+     *
+     * <p>
+     * For example, if the url was "view/myView/job/folder/job/taskName/",
+     * then result will be "job/folder/job/taskName/"
+     *
      * @param fullName Project name
      */
     public String getCanonicalEventUrl(String fullName) {
