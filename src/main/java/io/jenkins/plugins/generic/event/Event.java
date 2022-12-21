@@ -184,9 +184,13 @@ public class Event {
         return Objects.hash(type, source, url, id, time, dataType, data);
     }
 
+    public String getUrlData() {
+        return "item.locationChanged".equals(type) ? ", metaData=" + metaData.toString() : ", url=" + url;
+    }
+
     @Override
     public String toString() {
         return "Event [data=" + data + ", dataType=" + dataType + ", id=" + id +
-                ", source=" + source + ", url=" + url + ", time=" + time + ", type=" + type + "]";
+                ", source=" + source + this.getUrlData() + ", time=" + time + ", type=" + type + "]";
     }
 }

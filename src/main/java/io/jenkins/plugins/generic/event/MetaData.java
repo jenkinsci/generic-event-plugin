@@ -86,4 +86,10 @@ public class MetaData {
     public void setNewUrl(String newUrl) {
         this.newUrl = newUrl;
     }
+
+    @Override
+    public String toString() {
+        return "MetaData [oldUrl=" + oldUrl + ", newUrl=" + newUrl +
+                ", oldName=" + oldName + ", newName=" + newName + "]";
+    }
 }
