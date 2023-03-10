@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.33</version>
+        <version>4.55</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
@@ -40,8 +40,7 @@
         <changelist>999999-SNAPSHOT</changelist>
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>2.277.4</jenkins.version>
-        <java.level>8</java.level>
+        <jenkins.version>2.361.4</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
     </properties>
 
@@ -50,12 +49,8 @@
             <dependency>
                 <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.277.x</artifactId>
-                <!-- 
-                    Downgrade bom version from 984.vb5eaac999a7e to 876.vc43b4c6423b6 due to being compatiable with workflow-multibranch 2.24 and scm-api 2.6.4.
-                    Please refer to https://github.com/jenkinsci/bom/releases/tag/876.vc43b4c6423b6 
-                -->
-                <version>876.vc43b4c6423b6</version>
+                <artifactId>bom-2.361.x</artifactId>
+                <version>1887.vda_d0ddb_c15c4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -85,9 +80,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5</artifactId>
-            <version>5.1.2</version>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>apache-httpcomponents-client-5-api</artifactId>
         </dependency>
         <dependency>
             <groupId>net.jodah</groupId>
@@ -127,7 +121,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
