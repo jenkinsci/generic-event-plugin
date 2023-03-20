@@ -45,6 +45,11 @@ public class GenericEventItemListener extends ItemListener {
     public String getCanonicalEventUrl(String fullName) {
 
         StringBuilder resultUrl = new StringBuilder();
+
+        if (Stapler.getCurrentRequest() == null) {
+            return "";
+        }
+
         List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
         for (Ancestor anc : ancs) {
             if (anc.equals(ancs.get(ancs.size()-1))) {
