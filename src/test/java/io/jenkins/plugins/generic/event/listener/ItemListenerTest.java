@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.List;
 
 import static net.sf.json.test.JSONAssert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -41,7 +42,8 @@ public class ItemListenerTest {
     @Before
     public void setUp() {
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
-        config.setReceiver("http://localhost:5000/api/jenkins/event");
+        config.setReceiver("http://localhost:8000");
+//        config.setReceiver("http://localhost:5000/api/jenkins/event");
         JenkinsLocationConfiguration.get().setUrl(null);
 
         MockitoAnnotations.openMocks(this);
