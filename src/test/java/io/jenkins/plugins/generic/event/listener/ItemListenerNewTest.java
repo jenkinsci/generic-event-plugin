@@ -3,26 +3,21 @@ package io.jenkins.plugins.generic.event.listener;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import hudson.ExtensionList;
+import hudson.model.FreeStyleProject;
 import hudson.model.TopLevelItem;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventGlobalConfiguration;
 import io.jenkins.plugins.generic.event.EventSender;
-import jenkins.model.JenkinsLocationConfiguration;
-import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.jvnet.hudson.test.MockFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.File;
 import java.io.IOException;
 
-import static net.sf.json.test.JSONAssert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +41,39 @@ public class ItemListenerNewTest {
         listeners.forEach((listener) -> listener.setEventSender(mockSender));
     }
 
-    @Test public void rename() throws Exception {
+    @Test public void renameJob() throws Exception {
+        Folder f = createFolder();
+        f.setDescription("Some view");
+        TopLevelItem folderItem = r.jenkins.getItem("folder0");
+        assertSame(r.jenkins.getItem("folder0"), f);
+
+        r.waitUntilNoActivity();
+        verify(mockSender, times(4)).send(any(Event.class));
+
+        FreeStyleProject child = f.createProject(FreeStyleProject.class, "old-job-name");
+        String oldName = child.getName();
+
+        r.waitUntilNoActivity();
+        verify(mockSender, times(5)).send(any(Event.class));
+
+        HtmlForm cfg = r.createWebClient().getPage(child, "confirm-rename").getFormByName("config");
+        cfg.getInputByName("newName").setValueAttribute("new-job-name");
+        for (HtmlForm form : r.submit(cfg).getForms()) {
+            if (form.getActionAttribute().equals("confirmRename")) {
+                r.submit(form);
+                break;
+            }
+        }
+
+        r.waitUntilNoActivity();
+
+        Assert.assertEquals("new-job-name",child.getName());
+        assertNull(r.jenkins.getItemByFullName("folder0/old-job-name"));
+        assertSame(r.jenkins.getItemByFullName("folder0/new-job-name"), child);
+        verify(mockSender, times(7)).send(any(Event.class));
+    }
+
+    @Test public void renameFolder() throws Exception {
         Folder f = createFolder();
         f.setDescription("Some view");
         assertSame(r.jenkins.getItem("folder0"), f);
@@ -77,9 +104,7 @@ public class ItemListenerNewTest {
         return r.jenkins.createProject(Folder.class, "folder" + r.jenkins.getItems().size());
     }
 
-
-
     // todo move job to another folder
-        // todo move folder to another folder
+    // todo move folder to another folder
 
 }
