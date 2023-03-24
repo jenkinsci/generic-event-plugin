@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -99,9 +100,57 @@ public class ItemListenerNewTest {
         verify(mockSender, times(5)).send(any(Event.class));
     }
 
+    @Test public void moveJob() throws Exception {
+
+        Folder f1 = createFolder();
+        Folder f2 = createFolder();
+        f1.setDescription("Some view");
+        TopLevelItem folderItem = r.jenkins.getItem("folder0");
+        assertSame(r.jenkins.getItem("folder1"), f1);
+        assertSame(r.jenkins.getItem("folder2"), f2);
+
+        r.waitUntilNoActivity();
+        verify(mockSender, times(4)).send(any(Event.class));
+
+        FreeStyleProject child = f1.createProject(FreeStyleProject.class, "freestyle-job");
+        String oldName = child.getName();
+
+        r.waitUntilNoActivity();
+        verify(mockSender, times(5)).send(any(Event.class));
+
+        List<HtmlForm> forms = r.createWebClient().getPage(child, "move/").getForms();
+
+        for (HtmlForm form: forms) {
+            if (form.getActionAttribute().equals("move")) {
+                // todo ДОДЕЛАТЬ
+                form.getSelectByName("destination").getOptions();
+                form.getSelectByName("destination").setSelectedAttribute("target-folder", true);
+                form.getInputByName("destination").setValueAttribute("target-folder");
+                r.submit(form);
+                break;
+            }
+        }
+
+//        HtmlForm cfg = r.createWebClient().getPage(child, "move/").getForms();
+//        HtmlForm cfg = r.createWebClient().getPage(child, "move/").getFormByName("config");
+//        cfg.getInputByName("destination").setValueAttribute("target-folder");
+//        for (HtmlForm form : r.submit(cfg).getForms()) {
+//            if (form.getActionAttribute().equals("move")) {
+//                r.submit(form);
+//                break;
+//            }
+//        }
+
+        r.waitUntilNoActivity();
+
+        Assert.assertEquals("new-job-name",child.getName());
+        assertNull(r.jenkins.getItemByFullName("folder0/old-job-name"));
+        assertSame(r.jenkins.getItemByFullName("folder0/new-job-name"), child);
+        verify(mockSender, times(7)).send(any(Event.class));
+    }
 
     private Folder createFolder() throws IOException {
-        return r.jenkins.createProject(Folder.class, "folder" + r.jenkins.getItems().size());
+        return r.jenkins.createProject(Folder.class, "folder" + r.jenkins.getItems().size() + 1);
     }
 
     // todo move job to another folder
