@@ -110,22 +110,25 @@ public class ItemListenerNewTest {
         assertSame(r.jenkins.getItem("folder2"), f2);
 
         r.waitUntilNoActivity();
-        verify(mockSender, times(4)).send(any(Event.class));
+        verify(mockSender, times(6)).send(any(Event.class));
 
         FreeStyleProject child = f1.createProject(FreeStyleProject.class, "freestyle-job");
         String oldName = child.getName();
 
         r.waitUntilNoActivity();
-        verify(mockSender, times(5)).send(any(Event.class));
+        verify(mockSender, times(7)).send(any(Event.class));
 
         List<HtmlForm> forms = r.createWebClient().getPage(child, "move/").getForms();
 
         for (HtmlForm form: forms) {
             if (form.getActionAttribute().equals("move")) {
-                // todo ДОДЕЛАТЬ
-                form.getSelectByName("destination").getOptions();
-                form.getSelectByName("destination").setSelectedAttribute("target-folder", true);
-                form.getInputByName("destination").setValueAttribute("target-folder");
+//                form.getSelectByName("destination").getOptions();
+
+//                form.getSelectByName("destination")
+//                form.getSelectByName("destination").getOptionByValue("/folder1").setAttribute("selected", "");
+//                form.getSelectByName("destination").getOptionByValue("/folder1").removeAttribute("selected");
+                form.getSelectByName("destination").getOptionByValue("/folder2").setAttribute("selected", "yes");
+                form.getSelectByName("destination").setSelectedAttribute("selected", true);
                 r.submit(form);
                 break;
             }
@@ -150,7 +153,7 @@ public class ItemListenerNewTest {
     }
 
     private Folder createFolder() throws IOException {
-        return r.jenkins.createProject(Folder.class, "folder" + r.jenkins.getItems().size() + 1);
+        return r.jenkins.createProject(Folder.class, "folder" + (r.jenkins.getItems().size() + 1));
     }
 
     // todo move job to another folder
