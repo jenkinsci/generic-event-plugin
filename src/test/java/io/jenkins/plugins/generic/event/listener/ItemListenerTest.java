@@ -1,40 +1,31 @@
 package io.jenkins.plugins.generic.event.listener;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.ExtensionList;
+import hudson.model.FreeStyleProject;
+import hudson.model.Item;
 import hudson.model.Items;
-import hudson.model.TopLevelItem;
+import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventGlobalConfiguration;
 import io.jenkins.plugins.generic.event.EventSender;
-import jenkins.model.JenkinsLocationConfiguration;
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.jvnet.hudson.test.TestExtension;
+import org.mockito.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.List;
 
-import static net.sf.json.test.JSONAssert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class ItemListenerTest {
 
-    @Rule
-    public final JenkinsRule r = new JenkinsRule();
+    @Rule public JenkinsRule r = new JenkinsRule();
 
     @Mock
     EventSender mockSender;
@@ -42,131 +33,118 @@ public class ItemListenerTest {
     @Before
     public void setUp() {
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
-        config.setReceiver("http://localhost:8000");
-//        config.setReceiver("http://localhost:5000/api/jenkins/event");
-        JenkinsLocationConfiguration.get().setUrl(null);
-
+        config.setReceiver("http://localhost:5000/base");
         MockitoAnnotations.openMocks(this);
         ExtensionList<GenericEventItemListener> listeners = ExtensionList.lookup(GenericEventItemListener.class);
         listeners.forEach((listener) -> listener.setEventSender(mockSender));
     }
 
-    @Test
-    public void movePipelineToAnotherFolder() throws IOException, Exception {
-        doNothing().when(mockSender).send(any());
+    @Test public void renameFreeStyleJob() throws Exception {
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "old-job-name");
+        assertNews("created=folder created=folder/old-job-name");
+        assertSame(r.jenkins.getItemByFullName("folder/old-job-name"), project);
+        reset(mockSender);
 
-        MockFolder sourceFolder = r.createFolder("source-folder");
-        MockFolder targetFolder = r.createFolder("target-folder");
-
-        File sourceDest = sourceFolder.getConfigFile().getFile();
-        File targetDest = targetFolder.getConfigFile().getFile();
-        System.out.println("Source Folder location: " + sourceDest);
-        System.out.println("Target Folder location: " + targetDest);
-        WorkflowJob pipelineProject = sourceFolder.createProject(WorkflowJob.class, "example-pipeline");
-//        WorkflowMultiBranchProject project = folderProject.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-pipeline");
-//        WorkflowMultiBranchProject project = folderProject.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-pipeline");
-//        r.createFreeStyleProject("my-freestyle-project");
-
-//        pipelineProject.move();
-        File newBuildDir = targetFolder.getConfigFile().getFile();
-        WorkflowJob pipeline = (WorkflowJob) sourceFolder.getItem("example-pipeline");
-//        Collection<TopLevelItem> collection = sourceFolder.getItems();
-//        WorkflowJob job = collection
-        TopLevelItem tmp = sourceFolder.getItem("example-pipeline");
-
-//        JenkinsRule.WebClient client = r.createWebClient();
-        JSONObject json = new JSONObject();
-        json.put("destination", "/target-folder");
-        json.put("Jenkins-Crumb", "531b52a9598f8bc7f71817919c0173e93e1ff9ce8ddd812c5a3547634dc69a3e");
-        JenkinsRule.JSONWebResponse response = r.postJSON("job/source-folder/job/example-pipeline/move/move", json);
-        r.waitUntilNoActivity();
-//        JSONObject json = {"destination": "/старая папка", "Jenkins-Crumb": "531b52a9598f8bc7f71817919c0173e93e1ff9ce8ddd812c5a3547634dc69a3e"}
-//        client.goTo("job/target-folder/job/example-pipeline/move/move");
-
-
-
-
-
-//        Items tmp = (Items) sourceFolder.getItem("example-pipeline");
-//        tmp.move(tmp, targetFolder);
-        pipelineProject.movedTo(targetFolder, pipeline, targetDest);
-        pipelineProject.movedTo(targetFolder, pipeline, targetDest);
-//        pipeline.movedTo("target-folder");
-//        pipeline.renameTo("target-folder");
-//        pipelineProject.renameTo("target-folder");
-//        pipelineProject.movedTo(newBuildDir);
-
-        r.waitUntilNoActivity();
+        project.renameTo("new-job-name");
+        assertNews("renamed=folder/new-job-name;from=old-job-name moved=folder/new-job-name;from=folder/old-job-name");
         verify(mockSender, times(1)).send(any(Event.class));
-
-        // todo move job to another folder
-        // todo move folder to another folder
+        assertNull(r.jenkins.getItemByFullName("folder/old-job-name"));
+        assertSame(r.jenkins.getItemByFullName("folder/new-job-name"), project);
     }
 
-    @Test
-    public void renamePipeline() throws IOException, Exception {
-        doNothing().when(mockSender).send(any());
+    @Test public void renameFolder() throws Exception {
+        MockFolder folder = r.createFolder("folder");
+        MockFolder subFolder = folder.createProject(MockFolder.class, "old-subfolder");
+        assertNews("created=folder created=folder/old-subfolder");
+        assertSame(r.jenkins.getItemByFullName("folder/old-subfolder"), subFolder);
+        reset(mockSender);
 
-        MockFolder sourceFolder = r.createFolder("source-folder");
-        MockFolder targetFolder = r.createFolder("target-folder");
+        subFolder.renameTo("new-subfolder");
+        assertNews("renamed=folder/new-subfolder;from=old-subfolder moved=folder/new-subfolder;from=folder/old-subfolder");
+        verify(mockSender, times(1)).send(any(Event.class));
+        assertNull(r.jenkins.getItemByFullName("folder/old-subfolder"));
+        assertSame(r.jenkins.getItemByFullName("folder/new-subfolder"), subFolder);
+    }
 
-        File sourceDest = sourceFolder.getConfigFile().getFile();
-        File targetDest = targetFolder.getConfigFile().getFile();
-        System.out.println("Source Folder location: " + sourceDest);
-        System.out.println("Target Folder location: " + targetDest);
-        WorkflowJob pipelineProject = sourceFolder.createProject(WorkflowJob.class, "example-pipeline");
+    @Test public void moveFreeStyleJob() throws Exception {
 
-        WorkflowJob pipeline = (WorkflowJob) sourceFolder.getItem("example-pipeline");
+        MockFolder folder1 = r.createFolder("folder1");
+        MockFolder folder2 = r.createFolder("folder2");
+        FreeStyleProject project = folder1.createProject(FreeStyleProject.class, "freestyle-job");
+        assertNews("created=folder1 created=folder2 created=folder1/freestyle-job");
+        assertSame(r.jenkins.getItemByFullName("folder1/freestyle-job"), project);
+        reset(mockSender);
 
-        MockFolder f = sourceFolder;
-        String oldName = f.getName();
+        Items.move(project, folder2);
+        assertNews("moved=folder2/freestyle-job;from=folder1/freestyle-job");
+        verify(mockSender, times(1)).send(any(Event.class));
+        assertNull(r.jenkins.getItemByFullName("folder1/freestyle-job"));
+        assertSame(r.jenkins.getItemByFullName("folder2/freestyle-job"), project);
+    }
 
-        JenkinsRule.WebClient client = r.createWebClient();
-        HtmlForm cfg = client.getPage(sourceFolder, "confirm-rename").getFormByName("config");
-        cfg.getInputByName("newName").setValueAttribute("newName");
-        for (HtmlForm form : r.submit(cfg).getForms()) {
-            if (form.getActionAttribute().equals("confirmRename")) {
-                r.submit(form);
-                break;
-            }
+    @Test public void moveFolder() throws Exception {
+
+        MockFolder folder1 = r.createFolder("folder1");
+        MockFolder folder2 = r.createFolder("folder2");
+        MockFolder subFolder = folder1.createProject(MockFolder.class, "subfolder");
+        assertNews("created=folder1 created=folder2 created=folder1/subfolder");
+        assertSame(r.jenkins.getItemByFullName("folder1/subfolder"), subFolder);
+
+        Items.move(subFolder, folder2);
+        assertNews("moved=folder2/subfolder;from=folder1/subfolder");
+        verify(mockSender, times(4)).send(any(Event.class));
+        assertNull(r.jenkins.getItemByFullName("folder1/subfolder"));
+        assertSame(r.jenkins.getItemByFullName("folder2/subfolder"), subFolder);
+    }
+
+    private void assertNews(String expected) {
+        L l = r.jenkins.getExtensionList(ItemListener.class).get(L.class);
+        assertEquals(expected, l.b.toString().trim());
+        l.b.delete(0, l.b.length());
+    }
+
+    @TestExtension public static class L extends ItemListener {
+        final StringBuilder b = new StringBuilder();
+        @Override public void onCreated(Item item) {
+            b.append(" created=").append(item.getFullName());
+        }
+        @Override public void onDeleted(Item item) {
+            b.append(" deleted=").append(item.getFullName());
+        }
+        @Override public void onRenamed(Item item, String oldName, String newName) {
+            assertEquals(item.getName(), newName);
+            b.append(" renamed=").append(item.getFullName()).append(";from=").append(oldName);
+        }
+        @Override public void onLocationChanged(Item item, String oldFullName, String newFullName) {
+            assertEquals(item.getFullName(), newFullName);
+            b.append(" moved=").append(newFullName).append(";from=").append(oldFullName);
+        }
+    }
+
+    private Folder createFolder() throws IOException {
+        return r.jenkins.createProject(Folder.class, "folder" + (r.jenkins.getItems().size() + 1));
+    }
+
+    // todo move job to another folder
+    // todo move folder to another folder
+
+    public static class MyJsonObject {
+        private String destination;
+
+        //empty constructor required for JSON parsing.
+        public MyJsonObject() {}
+
+        public MyJsonObject(String message) {
+            this.destination = message;
         }
 
-        assertEquals("newName",f.getName());
-        assertEquals("Some view",f.getDescription());
-        assertNull(r.jenkins.getItem(oldName));
-        assertSame(r.jenkins.getItem("newName"),f);
+        public void setMessage(String message) {
+            this.destination = message;
+        }
 
-
-
-
-
-
-//        JenkinsRule.WebClient client = r.createWebClient();
-//        JSONObject json = new JSONObject();
-//        json.put("destination", "/target-folder");
-//        json.put("Jenkins-Crumb", "531b52a9598f8bc7f71817919c0173e93e1ff9ce8ddd812c5a3547634dc69a3e");
-//        JenkinsRule.JSONWebResponse response = r.postJSON("job/source-folder/job/example-pipeline/move/move", json);
-//        r.waitUntilNoActivity();
-//        JSONObject json = {"destination": "/старая папка", "Jenkins-Crumb": "531b52a9598f8bc7f71817919c0173e93e1ff9ce8ddd812c5a3547634dc69a3e"}
-//        client.goTo("job/target-folder/job/example-pipeline/move/move");
-
-
-
-
-
-//        Items tmp = (Items) sourceFolder.getItem("example-pipeline");
-//        tmp.move(tmp, targetFolder);
-//        pipelineProject.movedTo(targetFolder, pipeline, targetDest);
-//        pipelineProject.movedTo(targetFolder, pipeline, targetDest);
-//        pipeline.movedTo("target-folder");
-//        pipeline.renameTo("target-folder");
-//        pipelineProject.renameTo("target-folder");
-//        pipelineProject.movedTo(newBuildDir);
-
-        r.waitUntilNoActivity();
-        verify(mockSender, times(1)).send(any(Event.class));
-
-        // todo move job to another folder
-        // todo move folder to another folder
+        public String getMessage() {
+            return destination;
+        }
     }
 }
