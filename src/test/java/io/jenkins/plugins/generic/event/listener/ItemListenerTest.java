@@ -98,6 +98,26 @@ public class ItemListenerTest {
         assertSame(r.jenkins.getItemByFullName("folder2/subfolder"), subFolder);
     }
 
+    @Test public void deleteFreeStyleJobAndFolder() throws Exception {
+
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "freestyle-job");
+        assertNews("created=folder created=folder/freestyle-job");
+        assertSame(r.jenkins.getItemByFullName("folder/freestyle-job"), project);
+        reset(mockSender);
+
+        project.delete();
+        assertNews("updated=folder/freestyle-job deleted=folder/freestyle-job");
+        verify(mockSender, times(2)).send(any(Event.class));
+        assertNull(r.jenkins.getItemByFullName("folder/freestyle-job"));
+        reset(mockSender);
+
+        folder.delete();
+        assertNews("deleted=folder");
+        verify(mockSender, times(1)).send(any(Event.class));
+        assertNull(r.jenkins.getItemByFullName("folder"));
+    }
+
     private void assertNews(String expected) {
         ItemListenerLogger extensionList = r.jenkins.getExtensionList(ItemListener.class).get(ItemListenerLogger.class);
         assertEquals(expected, extensionList.b.toString().trim());
@@ -108,6 +128,10 @@ public class ItemListenerTest {
         final StringBuilder b = new StringBuilder();
         @Override public void onCreated(Item item) {
             b.append(" created=").append(item.getFullName());
+        }
+
+        @Override public void onUpdated(Item item) {
+            b.append(" updated=").append(item.getFullName());
         }
         @Override public void onDeleted(Item item) {
             b.append(" deleted=").append(item.getFullName());
