@@ -1,6 +1,5 @@
 package io.jenkins.plugins.generic.event.listener;
 
-import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.ExtensionList;
 import hudson.model.FreeStyleProject;
 import hudson.model.Item;
@@ -17,8 +16,6 @@ import org.jvnet.hudson.test.MockFolder;
 import org.jvnet.hudson.test.TestExtension;
 import org.mockito.*;
 
-import java.io.IOException;
-
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -30,6 +27,8 @@ public class ItemListenerTest {
     @Mock
     EventSender mockSender;
 
+    ItemListenerLogger extensionList;
+
     @Before
     public void setUp() {
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
@@ -37,6 +36,7 @@ public class ItemListenerTest {
         MockitoAnnotations.openMocks(this);
         ExtensionList<GenericEventItemListener> listeners = ExtensionList.lookup(GenericEventItemListener.class);
         listeners.forEach((listener) -> listener.setEventSender(mockSender));
+        extensionList = r.jenkins.getExtensionList(ItemListener.class).get(ItemListenerLogger.class);
     }
 
     @Test public void renameFreeStyleJob() throws Exception {
@@ -99,12 +99,11 @@ public class ItemListenerTest {
     }
 
     private void assertNews(String expected) {
-        L l = r.jenkins.getExtensionList(ItemListener.class).get(L.class);
-        assertEquals(expected, l.b.toString().trim());
-        l.b.delete(0, l.b.length());
+        assertEquals(expected, extensionList.b.toString().trim());
+        extensionList.b.delete(0, extensionList.b.length());
     }
 
-    @TestExtension public static class L extends ItemListener {
+    @TestExtension public static class ItemListenerLogger extends ItemListener {
         final StringBuilder b = new StringBuilder();
         @Override public void onCreated(Item item) {
             b.append(" created=").append(item.getFullName());
@@ -119,32 +118,6 @@ public class ItemListenerTest {
         @Override public void onLocationChanged(Item item, String oldFullName, String newFullName) {
             assertEquals(item.getFullName(), newFullName);
             b.append(" moved=").append(newFullName).append(";from=").append(oldFullName);
-        }
-    }
-
-    private Folder createFolder() throws IOException {
-        return r.jenkins.createProject(Folder.class, "folder" + (r.jenkins.getItems().size() + 1));
-    }
-
-    // todo move job to another folder
-    // todo move folder to another folder
-
-    public static class MyJsonObject {
-        private String destination;
-
-        //empty constructor required for JSON parsing.
-        public MyJsonObject() {}
-
-        public MyJsonObject(String message) {
-            this.destination = message;
-        }
-
-        public void setMessage(String message) {
-            this.destination = message;
-        }
-
-        public String getMessage() {
-            return destination;
         }
     }
 }
