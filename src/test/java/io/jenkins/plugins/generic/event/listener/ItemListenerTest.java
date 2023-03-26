@@ -8,6 +8,7 @@ import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventGlobalConfiguration;
 import io.jenkins.plugins.generic.event.EventSender;
+import jenkins.model.JenkinsLocationConfiguration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,16 +28,15 @@ public class ItemListenerTest {
     @Mock
     EventSender mockSender;
 
-    ItemListenerLogger extensionList;
-
     @Before
     public void setUp() {
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
-        config.setReceiver("http://localhost:5000/base");
+        config.setReceiver("http://localhost:8000");
+        JenkinsLocationConfiguration.get().setUrl(null);
+
         MockitoAnnotations.openMocks(this);
         ExtensionList<GenericEventItemListener> listeners = ExtensionList.lookup(GenericEventItemListener.class);
         listeners.forEach((listener) -> listener.setEventSender(mockSender));
-        extensionList = r.jenkins.getExtensionList(ItemListener.class).get(ItemListenerLogger.class);
     }
 
     @Test public void renameFreeStyleJob() throws Exception {
@@ -99,6 +99,7 @@ public class ItemListenerTest {
     }
 
     private void assertNews(String expected) {
+        ItemListenerLogger extensionList = r.jenkins.getExtensionList(ItemListener.class).get(ItemListenerLogger.class);
         assertEquals(expected, extensionList.b.toString().trim());
         extensionList.b.delete(0, extensionList.b.length());
     }
