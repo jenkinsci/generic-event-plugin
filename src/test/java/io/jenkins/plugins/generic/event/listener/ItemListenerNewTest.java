@@ -189,16 +189,18 @@ public class ItemListenerNewTest {
         verify(mockSender, times(7)).send(any(Event.class));
     }
 
-    @Test public void moveJobNew() throws Exception {
+    @Test public void moveFreeStyleJob() throws Exception {
 
         MockFolder folder1 = r.createFolder("folder1");
         MockFolder folder2 = r.createFolder("folder2");
         FreeStyleProject project = folder1.createProject(FreeStyleProject.class, "freestyle-job");
+        assertNews("created=folder1 created=folder2 created=folder1/freestyle-job");
         assertSame(r.jenkins.getItemByFullName("folder1/freestyle-job"), project);
+        reset(mockSender);
 
         Items.move(project, folder2);
-        r.waitUntilNoActivity();
-        verify(mockSender, times(4)).send(any(Event.class));
+        assertNews("moved=folder2/freestyle-job;from=folder1/freestyle-job");
+        verify(mockSender, times(1)).send(any(Event.class));
         assertNull(r.jenkins.getItemByFullName("folder1/freestyle-job"));
         assertSame(r.jenkins.getItemByFullName("folder2/freestyle-job"), project);
     }
@@ -224,7 +226,7 @@ public class ItemListenerNewTest {
         l.b.delete(0, l.b.length());
     }
 
-    @TestExtension("moveFolder") public static class L extends ItemListener {
+    @TestExtension public static class L extends ItemListener {
         final StringBuilder b = new StringBuilder();
         @Override public void onCreated(Item item) {
             b.append(" created=").append(item.getFullName());
