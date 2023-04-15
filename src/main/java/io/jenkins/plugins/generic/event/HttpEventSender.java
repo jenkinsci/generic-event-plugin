@@ -45,12 +45,12 @@ public class HttpEventSender implements EventSender {
             myClient.sendPost(receiver, event, new FutureCallback<SimpleHttpResponse>() {
                 @Override
                 public void completed(SimpleHttpResponse response) {
-                    logger.info("Event send succeeded, response: " + response.getBodyText());
+                    logger.info("Event send succeeded, response: " + response.getBodyText() + ", data: " + event.toString());
                 }
 
                 @Override
                 public void failed(Exception e) {
-                    logger.info("Event send has been failed, response: " + e);
+                    logger.info("Event send has been failed, response: " + e + ", data: " + event.toString());
                 }
 
                 @Override

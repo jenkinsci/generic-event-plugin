@@ -1,11 +1,19 @@
 package io.jenkins.plugins.generic.event.listener;
 
+import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.Extension;
-import hudson.model.Item;
+import hudson.Util;
+import hudson.model.*;
 import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
+import io.jenkins.plugins.generic.event.MetaData;
+import org.kohsuke.stapler.Ancestor;
+import org.kohsuke.stapler.Stapler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This listener collects events about all items.
@@ -25,12 +33,72 @@ public class GenericEventItemListener extends ItemListener {
         this.eventSender = eventSender;
     }
 
+    /**
+     * Normalizes url for canonical representation
+     *
+     * <p>
+     * For example, if the url was "view/myView/job/folder/job/taskName/",
+     * then result will be "job/folder/job/taskName/"
+     *
+     * @param fullName Project name
+     */
+    public String getCanonicalEventUrl(String fullName) {
+
+        StringBuilder resultUrl = new StringBuilder();
+
+        if (Stapler.getCurrentRequest() == null) {
+            return "";
+        }
+
+        List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
+        for (Ancestor anc : ancs) {
+            if (anc.equals(ancs.get(ancs.size()-1))) {
+                String uri = Stapler.getCurrentRequest().getOriginalRequestURI();
+                if (uri.endsWith("confirmRename") || uri.endsWith("configSubmit")) {
+                    continue;
+                }
+            }
+
+            Object o = anc.getObject();
+            if (o instanceof Folder) {
+                String urlToAdd = ((Folder) o).getName();
+                resultUrl.append("job/");
+                resultUrl.append(Util.rawEncode(urlToAdd));
+                resultUrl.append("/");
+            }
+        }
+
+        String entityName = fullName.substring(fullName.lastIndexOf('/') + 1);
+        resultUrl.append("job/");
+        resultUrl.append(Util.rawEncode(entityName));
+        resultUrl.append("/");
+
+        return resultUrl.toString();
+    }
+
+    public String getCanonicalEventUrlNewLocation(Item item, String newFullName) {
+
+        String jobName = newFullName.substring(newFullName.lastIndexOf('/') + 1);
+        List<String> urls_list = new ArrayList<>();
+        AbstractItem _item = (AbstractItem) item;
+        while (_item.getParent() != null) {
+            if (_item.getParent() instanceof Hudson) {
+                break;
+            }
+            String _url = ((AbstractItem) _item.getParent()).getShortUrl();
+            urls_list.add(0, _url);
+            _item = (AbstractItem) _item.getParent();
+        }
+
+        return String.join("", urls_list) + item.getParent().getUrlChildPrefix() + '/' + Util.rawEncode(jobName) + '/';
+    }
+
     @Override
     public void onCreated(Item item) {
         eventSender.send(new Event.EventBuilder()
                 .type("item.created")
                 .source(item.getParent().getUrl())
-                .url(item.getUrl())
+                .url(this.getCanonicalEventUrl(item.getName()))
                 .data(item)
                 .build());
     }
@@ -40,7 +108,7 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.deleted")
                 .source(item.getParent().getUrl())
-                .url(item.getUrl())
+                .url(this.getCanonicalEventUrl(item.getName()))
                 .data(item)
                 .build());
     }
@@ -50,8 +118,23 @@ public class GenericEventItemListener extends ItemListener {
         eventSender.send(new Event.EventBuilder()
                 .type("item.updated")
                 .source(item.getParent().getUrl())
-                .url(item.getUrl())
+                .url(this.getCanonicalEventUrl(item.getName()))
                 .data(item)
+                .build());
+    }
+
+    @Override
+    public void onLocationChanged(Item item, String oldFullName, String newFullName) {
+        eventSender.send(new Event.EventBuilder()
+                .type("item.locationChanged")
+                .source(item.getParent().getUrl())
+                .data(item)
+                .metaData(new MetaData.MetaDataBuilder()
+                        .oldName(oldFullName)
+                        .newName(newFullName)
+                        .oldUrl(this.getCanonicalEventUrl(oldFullName))
+                        .newUrl(this.getCanonicalEventUrlNewLocation(item, newFullName))
+                        .build())
                 .build());
     }
 }
