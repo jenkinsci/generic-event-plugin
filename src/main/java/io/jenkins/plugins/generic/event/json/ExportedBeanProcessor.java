@@ -3,8 +3,6 @@ package io.jenkins.plugins.generic.event.json;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.json.JSONException;
 import org.kohsuke.stapler.export.DataWriter;
@@ -28,8 +26,6 @@ import net.sf.json.processors.JsonBeanProcessorMatcher;
  * @author johnniang
  */
 public class ExportedBeanProcessor implements JsonBeanProcessor {
-
-    private final Logger logger = Logger.getLogger(ExportedBeanProcessor.class.getName());
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })

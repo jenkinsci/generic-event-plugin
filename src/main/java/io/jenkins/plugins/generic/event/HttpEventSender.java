@@ -1,6 +1,5 @@
 package io.jenkins.plugins.generic.event;
 
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
@@ -42,7 +42,7 @@ public class HttpEventSender implements EventSender {
         }
 
         try {
-            myClient.sendPost(receiver, event, new FutureCallback<SimpleHttpResponse>() {
+            myClient.sendPost(receiver, event, new FutureCallback<>() {
                 @Override
                 public void completed(SimpleHttpResponse response) {
                     logger.info("Event send succeeded, response: " + response.getBodyText() + ", data: " + event.toString());
@@ -64,7 +64,7 @@ public class HttpEventSender implements EventSender {
 
     }
 
-    static public class CustomCloseableHttpAsyncClient {
+    public static class CustomCloseableHttpAsyncClient {
 
         private static final CloseableHttpAsyncClient httpClient;
         private static String rootUrl = null;
@@ -74,7 +74,11 @@ public class HttpEventSender implements EventSender {
                     .create()
                     .setMaxConnPerRoute(1)
                     .setMaxConnTotal(1)
-                    .setConnectionTimeToLive(TimeValue.ofSeconds(10L))
+                    .setDefaultConnectionConfig(
+                            ConnectionConfig
+                                    .custom()
+                                    .setTimeToLive(TimeValue.ofSeconds(10L))
+                                    .build())
                     .build();
 
             httpClient = HttpAsyncClients.custom().setConnectionManager(cmb).build();
