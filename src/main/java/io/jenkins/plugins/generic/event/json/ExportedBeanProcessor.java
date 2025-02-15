@@ -3,7 +3,6 @@ package io.jenkins.plugins.generic.event.json;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.json.JSONException;

@@ -5,7 +5,6 @@ import io.jenkins.plugins.generic.event.data.WorkflowRunData;
 import net.jodah.typetools.TypeResolver;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;

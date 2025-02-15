@@ -1,6 +1,5 @@
 package io.jenkins.plugins.generic.event;
 
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,7 +13,7 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.ContentType;
 import io.jenkins.plugins.generic.event.json.EventJsonConfig;
 import io.jenkins.plugins.generic.event.transformer.EventDataTransformers;
 import net.sf.json.JSONObject;
