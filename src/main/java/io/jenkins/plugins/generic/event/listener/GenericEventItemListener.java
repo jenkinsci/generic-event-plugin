@@ -46,14 +46,14 @@ public class GenericEventItemListener extends ItemListener {
 
         StringBuilder resultUrl = new StringBuilder();
 
-        if (Stapler.getCurrentRequest() == null) {
+        if (Stapler.getCurrentRequest2() == null) {
             return "";
         }
 
-        List<Ancestor> ancs = Stapler.getCurrentRequest().getAncestors();
+        List<Ancestor> ancs = Stapler.getCurrentRequest2().getAncestors();
         for (Ancestor anc : ancs) {
             if (anc.equals(ancs.get(ancs.size()-1))) {
-                String uri = Stapler.getCurrentRequest().getOriginalRequestURI();
+                String uri = Stapler.getCurrentRequest2().getOriginalRequestURI();
                 if (uri.endsWith("confirmRename") || uri.endsWith("configSubmit")) {
                     continue;
                 }
