@@ -107,8 +107,8 @@ public class ItemListenerTest {
         reset(mockSender);
 
         project.delete();
-        assertNews("updated=folder/freestyle-job deleted=folder/freestyle-job");
-        verify(mockSender, times(2)).send(any(Event.class));
+        assertNews("deleted=folder/freestyle-job");
+        verify(mockSender).send(any(Event.class));
         assertNull(r.jenkins.getItemByFullName("folder/freestyle-job"));
         reset(mockSender);
 
