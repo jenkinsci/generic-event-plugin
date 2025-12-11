@@ -1,6 +1,5 @@
 package io.jenkins.plugins.generic.event;
 
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,11 +12,15 @@ import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.*;
 import io.jenkins.plugins.generic.event.json.EventJsonConfig;
 import io.jenkins.plugins.generic.event.transformer.EventDataTransformers;
 import net.sf.json.JSONObject;
+import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+import org.apache.hc.core5.reactor.ssl.TlsDetails;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.TimeValue;
 
 /**
@@ -70,8 +73,14 @@ public class HttpEventSender implements EventSender {
         private static String rootUrl = null;
 
         static {
+            final TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
+                    .setSslContext(SSLContexts.createSystemDefault())
+                    .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
+                    .build();
+
             PoolingAsyncClientConnectionManager cmb = PoolingAsyncClientConnectionManagerBuilder
                     .create()
+                    .setTlsStrategy(tlsStrategy)
                     .setMaxConnPerRoute(1)
                     .setMaxConnTotal(1)
                     .setConnectionTimeToLive(TimeValue.ofSeconds(10L))
