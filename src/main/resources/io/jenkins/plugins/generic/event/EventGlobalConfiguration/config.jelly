@@ -5,5 +5,54 @@
              description="The receiver that can receive events fired by system.">
       <f:textbox/>
     </f:entry>
+
+    <f:entry title="${%Job Name Patterns}" field="jobNamePatterns"
+             description="Filter events by job name using regex patterns (one per line). If empty, all jobs will send events. Use full job names for folders (e.g., 'folder/job-name' or 'folder/.*' for all jobs in a folder).">
+      <f:textarea/>
+    </f:entry>
+
+    <f:advanced title="Event Type Configuration">
+      <f:section title="Run Events">
+        <f:entry title="${%Send Run Started Events}" field="sendRunStarted"
+                 description="Send events when a build starts">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Run Completed Events}" field="sendRunCompleted"
+                 description="Send events when a build completes">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Run Finalized Events}" field="sendRunFinalized"
+                 description="Send events when a build is finalized">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Run Initialized Events}" field="sendRunInitialized"
+                 description="Send events when a build is initialized">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Run Deleted Events}" field="sendRunDeleted"
+                 description="Send events when a build is deleted">
+          <f:checkbox default="true"/>
+        </f:entry>
+      </f:section>
+
+      <f:section title="Item Events">
+        <f:entry title="${%Send Item Created Events}" field="sendItemCreated"
+                 description="Send events when a job or folder is created">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Item Deleted Events}" field="sendItemDeleted"
+                 description="Send events when a job or folder is deleted">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Item Updated Events}" field="sendItemUpdated"
+                 description="Send events when a job or folder configuration is updated">
+          <f:checkbox default="true"/>
+        </f:entry>
+        <f:entry title="${%Send Item Location Changed Events}" field="sendItemLocationChanged"
+                 description="Send events when a job or folder is renamed or moved">
+          <f:checkbox default="true"/>
+        </f:entry>
+      </f:section>
+    </f:advanced>
   </f:section>
 </j:jelly>

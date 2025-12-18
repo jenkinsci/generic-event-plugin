@@ -6,6 +6,7 @@ import hudson.Util;
 import hudson.model.*;
 import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
+import io.jenkins.plugins.generic.event.EventGlobalConfiguration;
 import io.jenkins.plugins.generic.event.EventSender;
 import io.jenkins.plugins.generic.event.HttpEventSender;
 import io.jenkins.plugins.generic.event.MetaData;
@@ -95,46 +96,58 @@ public class GenericEventItemListener extends ItemListener {
 
     @Override
     public void onCreated(Item item) {
-        eventSender.send(new Event.EventBuilder()
-                .type("item.created")
-                .source(item.getParent().getUrl())
-                .url(this.getCanonicalEventUrl(item.getName()))
-                .data(item)
-                .build());
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        if (config != null && config.isSendItemCreated() && config.matchesJobNamePattern(item.getFullName())) {
+            eventSender.send(new Event.EventBuilder()
+                    .type("item.created")
+                    .source(item.getParent().getUrl())
+                    .url(this.getCanonicalEventUrl(item.getName()))
+                    .data(item)
+                    .build());
+        }
     }
 
     @Override
     public void onDeleted(Item item) {
-        eventSender.send(new Event.EventBuilder()
-                .type("item.deleted")
-                .source(item.getParent().getUrl())
-                .url(this.getCanonicalEventUrl(item.getName()))
-                .data(item)
-                .build());
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        if (config != null && config.isSendItemDeleted() && config.matchesJobNamePattern(item.getFullName())) {
+            eventSender.send(new Event.EventBuilder()
+                    .type("item.deleted")
+                    .source(item.getParent().getUrl())
+                    .url(this.getCanonicalEventUrl(item.getName()))
+                    .data(item)
+                    .build());
+        }
     }
 
     @Override
     public void onUpdated(Item item) {
-        eventSender.send(new Event.EventBuilder()
-                .type("item.updated")
-                .source(item.getParent().getUrl())
-                .url(this.getCanonicalEventUrl(item.getName()))
-                .data(item)
-                .build());
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        if (config != null && config.isSendItemUpdated() && config.matchesJobNamePattern(item.getFullName())) {
+            eventSender.send(new Event.EventBuilder()
+                    .type("item.updated")
+                    .source(item.getParent().getUrl())
+                    .url(this.getCanonicalEventUrl(item.getName()))
+                    .data(item)
+                    .build());
+        }
     }
 
     @Override
     public void onLocationChanged(Item item, String oldFullName, String newFullName) {
-        eventSender.send(new Event.EventBuilder()
-                .type("item.locationChanged")
-                .source(item.getParent().getUrl())
-                .data(item)
-                .metaData(new MetaData.MetaDataBuilder()
-                        .oldName(oldFullName)
-                        .newName(newFullName)
-                        .oldUrl(this.getCanonicalEventUrl(oldFullName))
-                        .newUrl(this.getCanonicalEventUrlNewLocation(item, newFullName))
-                        .build())
-                .build());
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        if (config != null && config.isSendItemLocationChanged() && config.matchesJobNamePattern(newFullName)) {
+            eventSender.send(new Event.EventBuilder()
+                    .type("item.locationChanged")
+                    .source(item.getParent().getUrl())
+                    .data(item)
+                    .metaData(new MetaData.MetaDataBuilder()
+                            .oldName(oldFullName)
+                            .newName(newFullName)
+                            .oldUrl(this.getCanonicalEventUrl(oldFullName))
+                            .newUrl(this.getCanonicalEventUrlNewLocation(item, newFullName))
+                            .build())
+                    .build());
+        }
     }
 }
