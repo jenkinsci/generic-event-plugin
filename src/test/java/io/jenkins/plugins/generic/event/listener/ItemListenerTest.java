@@ -98,6 +98,95 @@ public class ItemListenerTest {
         assertSame(r.jenkins.getItemByFullName("folder2/subfolder"), subFolder);
     }
 
+    @Test public void createDeleteWithDisabledEvents() throws Exception {
+        // Disable created and deleted events
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setSendItemCreated(false);
+        config.setSendItemDeleted(false);
+
+        MockFolder folder = r.createFolder("test-folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "test-job");
+
+        // No created events should be sent
+        verify(mockSender, never()).send(any(Event.class));
+
+        project.delete();
+        folder.delete();
+
+        // No deleted events should be sent
+        verify(mockSender, never()).send(any(Event.class));
+
+        // Re-enable for other tests
+        config.setSendItemCreated(true);
+        config.setSendItemDeleted(true);
+    }
+
+    @Test public void renameWithDisabledLocationChangedEvents() throws Exception {
+        // Disable location changed events
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setSendItemLocationChanged(false);
+
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "old-name");
+        reset(mockSender);
+
+        project.renameTo("new-name");
+
+        // No location changed events should be sent
+        verify(mockSender, never()).send(any(Event.class));
+
+        // Re-enable for other tests
+        config.setSendItemLocationChanged(true);
+    }
+
+    @Test public void createWithMatchingPattern() throws Exception {
+        // Set pattern to match jobs in "folder"
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setJobNamePatterns("folder\nfolder/.*");
+
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "test-job");
+
+        // Both folder and folder/test-job should send events
+        verify(mockSender, times(2)).send(any(Event.class));
+
+        // Clear pattern for other tests
+        config.setJobNamePatterns(null);
+    }
+
+    @Test public void createWithNonMatchingPattern() throws Exception {
+        // Set pattern that won't match
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setJobNamePatterns("production/.*");
+
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "test-job");
+
+        // No events should be sent
+        verify(mockSender, never()).send(any(Event.class));
+
+        // Clear pattern for other tests
+        config.setJobNamePatterns(null);
+    }
+
+    @Test public void renameWithPatternMatchingNewName() throws Exception {
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "old-name");
+        reset(mockSender);
+
+        // Set pattern to match the new name
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setJobNamePatterns("folder/new-name");
+
+        project.renameTo("new-name");
+
+        // Location changed event should be sent because new name matches
+        verify(mockSender, times(1)).send(any(Event.class));
+
+        // Clear pattern for other tests
+        config.setJobNamePatterns(null);
+    }
+
     @Test public void deleteFreeStyleJobAndFolder() throws Exception {
 
         MockFolder folder = r.createFolder("folder");
