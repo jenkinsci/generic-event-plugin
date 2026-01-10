@@ -99,6 +99,112 @@ public class RunListenerTest {
     }
 
     @Test
+    public void runSimplePipelineWithDisabledEvents() throws Exception {
+        doNothing().when(mockSender).send(any());
+
+        // Disable all run events
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setSendRunStarted(false);
+        config.setSendRunCompleted(false);
+        config.setSendRunFinalized(false);
+        config.setSendRunInitialized(false);
+        config.setSendRunDeleted(false);
+
+        final WorkflowRun run = runPipeline(JENKINSFILE);
+
+        r.assertBuildStatusSuccess(run);
+        r.assertLogContains("Hello World!", run);
+        // No events should be sent
+        verify(mockSender, never()).send(any(Event.class));
+
+        // Re-enable for other tests
+        config.setSendRunStarted(true);
+        config.setSendRunCompleted(true);
+        config.setSendRunFinalized(true);
+        config.setSendRunInitialized(true);
+        config.setSendRunDeleted(true);
+    }
+
+    @Test
+    public void runSimplePipelineWithSelectiveEvents() throws Exception {
+        doNothing().when(mockSender).send(any());
+
+        // Only enable started and completed events
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setSendRunStarted(true);
+        config.setSendRunCompleted(true);
+        config.setSendRunFinalized(false);
+        config.setSendRunInitialized(false);
+        config.setSendRunDeleted(false);
+
+        final WorkflowRun run = runPipeline(JENKINSFILE);
+
+        r.assertBuildStatusSuccess(run);
+        r.assertLogContains("Hello World!", run);
+        // Only started and completed events should be sent (2 events)
+        verify(mockSender, times(2)).send(any(Event.class));
+
+        // Re-enable for other tests
+        config.setSendRunFinalized(true);
+        config.setSendRunInitialized(true);
+        config.setSendRunDeleted(true);
+    }
+
+    @Test
+    public void runPipelineWithMatchingPattern() throws Exception {
+        doNothing().when(mockSender).send(any());
+
+        // Set pattern to match jobs in "my-devops-project" folder
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setJobNamePatterns("my-devops-project/.*");
+
+        final WorkflowRun run = runPipeline(JENKINSFILE);
+
+        r.assertBuildStatusSuccess(run);
+        // Events should be sent because job matches pattern
+        verify(mockSender, times(4)).send(any(Event.class));
+
+        // Clear pattern for other tests
+        config.setJobNamePatterns(null);
+    }
+
+    @Test
+    public void runPipelineWithNonMatchingPattern() throws Exception {
+        doNothing().when(mockSender).send(any());
+
+        // Set pattern that won't match the job
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setJobNamePatterns("production/.*\nstaging/.*");
+
+        final WorkflowRun run = runPipeline(JENKINSFILE);
+
+        r.assertBuildStatusSuccess(run);
+        // No events should be sent because job doesn't match pattern
+        verify(mockSender, never()).send(any(Event.class));
+
+        // Clear pattern for other tests
+        config.setJobNamePatterns(null);
+    }
+
+    @Test
+    public void runPipelineWithMultiplePatterns() throws Exception {
+        doNothing().when(mockSender).send(any());
+
+        // Set multiple patterns, one of which matches
+        EventGlobalConfiguration config = EventGlobalConfiguration.get();
+        config.setJobNamePatterns("production/.*\nmy-devops-project/example-pipeline\nstaging/.*");
+
+        final WorkflowRun run = runPipeline(JENKINSFILE);
+
+        r.assertBuildStatusSuccess(run);
+        // Events should be sent because job matches one of the patterns
+        verify(mockSender, times(4)).send(any(Event.class));
+
+        // Clear pattern for other tests
+        config.setJobNamePatterns(null);
+    }
+
+    @Test
     public void runMultiBranchPipeline() throws Exception {
         doNothing().when(mockSender).send(any());
 
