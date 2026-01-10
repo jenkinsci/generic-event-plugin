@@ -32,10 +32,10 @@
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.baseline>2.479</jenkins.baseline>
+        <jenkins.baseline>2.516</jenkins.baseline>
 
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
     </properties>
 
@@ -49,7 +49,7 @@
                     Downgrade bom version from 984.vb5eaac999a7e to 876.vc43b4c6423b6 due to being compatiable with workflow-multibranch 2.24 and scm-api 2.6.4.
                     Please refer to https://github.com/jenkinsci/bom/releases/tag/876.vc43b4c6423b6 
                 -->
-                <version>4136.vca_c3202a_7fd1</version>
+                <version>5888.vd99c2b_38128d</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.1.2</version>
+            <version>5.6</version>
         </dependency>
         <dependency>
             <groupId>net.jodah</groupId>
