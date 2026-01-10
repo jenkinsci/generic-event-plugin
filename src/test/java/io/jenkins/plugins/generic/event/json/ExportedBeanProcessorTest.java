@@ -3,48 +3,50 @@ package io.jenkins.plugins.generic.event.json;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExportedBeanProcessorTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class ExportedBeanProcessorTest {
 
     private JsonConfig jsonConfig;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         jsonConfig = new EventJsonConfig();
     }
 
     @Test
-    public void serializeNullEntity() {
+    void serializeNullEntity() {
         Map<String, ExportedEntity> entityMap = new HashMap<>(1);
         entityMap.put("entity", null);
         String json = JSONObject.fromObject(entityMap, jsonConfig).toString();
-        Assert.assertEquals("{\"entity\":null}", json);
+        assertEquals("{\"entity\":null}", json);
     }
 
     @Test
-    public void shouldIgnoreURLandName() {
+    void shouldIgnoreURLandName() {
         ExportedEntity entity = new ExportedEntity(18, "fake/url", "fake name");
         String json = JSONObject.fromObject(entity, jsonConfig).toString();
-        Assert.assertEquals("{\"_class\":\"io.jenkins.plugins.generic.event.json.ExportedBeanProcessorTest$ExportedEntity\",\"age\":18}", json);
+        assertEquals("{\"_class\":\"io.jenkins.plugins.generic.event.json.ExportedBeanProcessorTest$ExportedEntity\",\"age\":18}", json);
     }
 
     @Test
-    public void shouldFallbackToNormalSerialization() {
+    void shouldFallbackToNormalSerialization() {
         ExportedEntity entity = new ExportedEntity(-1, "fake/url", "fake name");
-        JSONException jsonException = Assert.assertThrows(JSONException.class, () -> JSONObject.fromObject(entity, jsonConfig));
-        Assert.assertEquals("Failed to serialize @Exported model", jsonException.getMessage());
+        JSONException jsonException = assertThrows(JSONException.class, () -> JSONObject.fromObject(entity, jsonConfig));
+        assertEquals("Failed to serialize @Exported model", jsonException.getMessage());
         // Get the root cause of the problem. Exception chain: JSONException <- IOException <- IllegalStateException.
         Throwable realCause = jsonException.getCause().getCause().getCause();
-        Assert.assertEquals(IllegalStateException.class, realCause.getClass());
-        Assert.assertEquals("Age must not be less than 1", realCause.getMessage());
+        assertEquals(IllegalStateException.class, realCause.getClass());
+        assertEquals("Age must not be less than 1", realCause.getMessage());
     }
 
     @ExportedBean

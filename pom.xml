@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>5.7</version>
+        <version>5.2102.v5f5fe09fccf1</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
@@ -37,6 +37,7 @@
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
+        <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
     </properties>
 
     <dependencyManagement>
@@ -45,10 +46,6 @@
                 <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <!-- 
-                    Downgrade bom version from 984.vb5eaac999a7e to 876.vc43b4c6423b6 due to being compatiable with workflow-multibranch 2.24 and scm-api 2.6.4.
-                    Please refer to https://github.com/jenkinsci/bom/releases/tag/876.vc43b4c6423b6 
-                -->
                 <version>5888.vd99c2b_38128d</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -120,7 +117,7 @@
 
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

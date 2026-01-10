@@ -9,37 +9,41 @@ import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventGlobalConfiguration;
 import io.jenkins.plugins.generic.event.EventSender;
 import jenkins.model.JenkinsLocationConfiguration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
 import org.jvnet.hudson.test.TestExtension;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ItemListenerTest {
+@ExtendWith(MockitoExtension.class)
+@WithJenkins
+class ItemListenerTest {
 
-    @Rule public JenkinsRule r = new JenkinsRule();
+    private JenkinsRule r;
 
     @Mock
-    EventSender mockSender;
+    private EventSender mockSender;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        r = rule;
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setReceiver("http://localhost:8000");
         JenkinsLocationConfiguration.get().setUrl(null);
 
-        MockitoAnnotations.openMocks(this);
         ExtensionList<GenericEventItemListener> listeners = ExtensionList.lookup(GenericEventItemListener.class);
-        listeners.forEach((listener) -> listener.setEventSender(mockSender));
+        listeners.forEach(listener -> listener.setEventSender(mockSender));
     }
 
-    @Test public void renameFreeStyleJob() throws Exception {
+    @Test
+    void renameFreeStyleJob() throws Exception {
         MockFolder folder = r.createFolder("folder");
         FreeStyleProject project = folder.createProject(FreeStyleProject.class, "old-job-name");
         assertNews("created=folder created=folder/old-job-name");
@@ -53,7 +57,8 @@ public class ItemListenerTest {
         assertSame(r.jenkins.getItemByFullName("folder/new-job-name"), project);
     }
 
-    @Test public void renameFolder() throws Exception {
+    @Test
+    void renameFolder() throws Exception {
         MockFolder folder = r.createFolder("folder");
         MockFolder subFolder = folder.createProject(MockFolder.class, "old-subfolder");
         assertNews("created=folder created=folder/old-subfolder");
@@ -67,8 +72,8 @@ public class ItemListenerTest {
         assertSame(r.jenkins.getItemByFullName("folder/new-subfolder"), subFolder);
     }
 
-    @Test public void moveFreeStyleJob() throws Exception {
-
+    @Test
+    void moveFreeStyleJob() throws Exception {
         MockFolder folder1 = r.createFolder("folder1");
         MockFolder folder2 = r.createFolder("folder2");
         FreeStyleProject project = folder1.createProject(FreeStyleProject.class, "freestyle-job");
@@ -83,8 +88,8 @@ public class ItemListenerTest {
         assertSame(r.jenkins.getItemByFullName("folder2/freestyle-job"), project);
     }
 
-    @Test public void moveFolder() throws Exception {
-
+    @Test
+    void moveFolder() throws Exception {
         MockFolder folder1 = r.createFolder("folder1");
         MockFolder folder2 = r.createFolder("folder2");
         MockFolder subFolder = folder1.createProject(MockFolder.class, "subfolder");
@@ -98,7 +103,8 @@ public class ItemListenerTest {
         assertSame(r.jenkins.getItemByFullName("folder2/subfolder"), subFolder);
     }
 
-    @Test public void createDeleteWithDisabledEvents() throws Exception {
+    @Test
+    void createDeleteWithDisabledEvents() throws Exception {
         // Disable created and deleted events
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setSendItemCreated(false);
@@ -121,7 +127,8 @@ public class ItemListenerTest {
         config.setSendItemDeleted(true);
     }
 
-    @Test public void renameWithDisabledLocationChangedEvents() throws Exception {
+    @Test
+    void renameWithDisabledLocationChangedEvents() throws Exception {
         // Disable location changed events
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setSendItemLocationChanged(false);
@@ -139,7 +146,8 @@ public class ItemListenerTest {
         config.setSendItemLocationChanged(true);
     }
 
-    @Test public void createWithMatchingPattern() throws Exception {
+    @Test
+    void createWithMatchingPattern() throws Exception {
         // Set pattern to match jobs in "folder"
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setJobNamePatterns("folder\nfolder/.*");
@@ -154,7 +162,8 @@ public class ItemListenerTest {
         config.setJobNamePatterns(null);
     }
 
-    @Test public void createWithNonMatchingPattern() throws Exception {
+    @Test
+    void createWithNonMatchingPattern() throws Exception {
         // Set pattern that won't match
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setJobNamePatterns("production/.*");
@@ -169,7 +178,8 @@ public class ItemListenerTest {
         config.setJobNamePatterns(null);
     }
 
-    @Test public void renameWithPatternMatchingNewName() throws Exception {
+    @Test
+    void renameWithPatternMatchingNewName() throws Exception {
         MockFolder folder = r.createFolder("folder");
         FreeStyleProject project = folder.createProject(FreeStyleProject.class, "old-name");
         reset(mockSender);
@@ -187,8 +197,8 @@ public class ItemListenerTest {
         config.setJobNamePatterns(null);
     }
 
-    @Test public void deleteFreeStyleJobAndFolder() throws Exception {
-
+    @Test
+    void deleteFreeStyleJobAndFolder() throws Exception {
         MockFolder folder = r.createFolder("folder");
         FreeStyleProject project = folder.createProject(FreeStyleProject.class, "freestyle-job");
         assertNews("created=folder created=folder/freestyle-job");
