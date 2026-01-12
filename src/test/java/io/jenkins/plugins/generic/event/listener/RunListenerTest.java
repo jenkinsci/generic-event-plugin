@@ -11,32 +11,39 @@ import jenkins.model.JenkinsLocationConfiguration;
 import jenkins.plugins.git.GitBranchSCMHead;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
+import jenkins.plugins.git.junit.jupiter.WithGitSampleRepo;
 import jenkins.scm.api.SCMHead;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.BuildWatcher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockBuilder;
 import org.jvnet.hudson.test.MockFolder;
+import org.jvnet.hudson.test.junit.jupiter.BuildWatcherExtension;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
-public class RunListenerTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+@WithJenkins
+@WithGitSampleRepo
+class RunListenerTest {
 
     private static final String JENKINSFILE = m(
             "pipeline {",
@@ -50,32 +57,33 @@ public class RunListenerTest {
             "  }",
             "}");
 
-    @ClassRule
-    public static final BuildWatcher buildWatcher = new BuildWatcher();
+    @RegisterExtension
+    @SuppressWarnings("unused")
+    private static final BuildWatcherExtension buildWatcher = new BuildWatcherExtension();
 
-    @Rule
-    public final JenkinsRule r = new JenkinsRule();
+    private JenkinsRule r;
 
-    @Rule
-    public final GitSampleRepoRule sampleRepo = new GitSampleRepoRule();
+    private GitSampleRepoRule sampleRepo;
 
     @Mock
-    EventSender mockSender;
+    private EventSender mockSender;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp(JenkinsRule rule, GitSampleRepoRule repo) {
+        r = rule;
+        sampleRepo = repo;
+
         EventGlobalConfiguration config = EventGlobalConfiguration.get();
         config.setReceiver("http://localhost:8000");
         // simulate outside HTTP request
         JenkinsLocationConfiguration.get().setUrl(null);
 
-        MockitoAnnotations.openMocks(this);
         ExtensionList<GenericEventRunListener> listeners = ExtensionList.lookup(GenericEventRunListener.class);
         listeners.forEach((listener) -> listener.setEventSender(mockSender));
     }
 
     @Test
-    public void runSimplePipeline() throws Exception {
+    void runSimplePipeline() throws Exception {
         doNothing().when(mockSender).send(any());
 
         final WorkflowRun run = runPipeline(JENKINSFILE);
@@ -87,7 +95,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runFreestyleProject() throws IOException, ExecutionException, InterruptedException {
+    void runFreestyleProject() throws IOException, ExecutionException, InterruptedException {
         doNothing().when(mockSender).send(any());
 
         FreeStyleProject project = r.createFreeStyleProject("my-freestyle-project");
@@ -99,7 +107,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runSimplePipelineWithDisabledEvents() throws Exception {
+    void runSimplePipelineWithDisabledEvents() throws Exception {
         doNothing().when(mockSender).send(any());
 
         // Disable all run events
@@ -126,7 +134,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runSimplePipelineWithSelectiveEvents() throws Exception {
+    void runSimplePipelineWithSelectiveEvents() throws Exception {
         doNothing().when(mockSender).send(any());
 
         // Only enable started and completed events
@@ -151,7 +159,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runPipelineWithMatchingPattern() throws Exception {
+    void runPipelineWithMatchingPattern() throws Exception {
         doNothing().when(mockSender).send(any());
 
         // Set pattern to match jobs in "my-devops-project" folder
@@ -169,7 +177,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runPipelineWithNonMatchingPattern() throws Exception {
+    void runPipelineWithNonMatchingPattern() throws Exception {
         doNothing().when(mockSender).send(any());
 
         // Set pattern that won't match the job
@@ -187,7 +195,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runPipelineWithMultiplePatterns() throws Exception {
+    void runPipelineWithMultiplePatterns() throws Exception {
         doNothing().when(mockSender).send(any());
 
         // Set multiple patterns, one of which matches
@@ -205,7 +213,7 @@ public class RunListenerTest {
     }
 
     @Test
-    public void runMultiBranchPipeline() throws Exception {
+    void runMultiBranchPipeline() throws Exception {
         doNothing().when(mockSender).send(any());
 
         sampleRepo.init();
