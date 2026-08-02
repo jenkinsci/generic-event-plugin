@@ -43,7 +43,7 @@ public class GenericEventItemListener extends ItemListener {
      *
      * @param fullName Project name
      */
-    public String getCanonicalEventUrl(String fullName) {
+    public String getCanonicalEventUrl(String fullName, String source) {
 
         StringBuilder resultUrl = new StringBuilder();
 
@@ -51,25 +51,13 @@ public class GenericEventItemListener extends ItemListener {
             return "";
         }
 
-        List<Ancestor> ancs = Stapler.getCurrentRequest2().getAncestors();
-        for (Ancestor anc : ancs) {
-            if (anc.equals(ancs.get(ancs.size()-1))) {
-                String uri = Stapler.getCurrentRequest2().getOriginalRequestURI();
-                if (uri.endsWith("confirmRename") || uri.endsWith("configSubmit")) {
-                    continue;
-                }
-            }
+        String entityName = fullName.substring(fullName.lastIndexOf('/') + 1);
 
-            Object o = anc.getObject();
-            if (o instanceof Folder) {
-                String urlToAdd = ((Folder) o).getName();
-                resultUrl.append("job/");
-                resultUrl.append(Util.rawEncode(urlToAdd));
-                resultUrl.append("/");
-            }
+        if (!source.isEmpty()) {
+            resultUrl.append(source);
+            System.out.println(source);
         }
 
-        String entityName = fullName.substring(fullName.lastIndexOf('/') + 1);
         resultUrl.append("job/");
         resultUrl.append(Util.rawEncode(entityName));
         resultUrl.append("/");
@@ -101,7 +89,7 @@ public class GenericEventItemListener extends ItemListener {
             eventSender.send(new Event.EventBuilder()
                     .type("item.created")
                     .source(item.getParent().getUrl())
-                    .url(this.getCanonicalEventUrl(item.getName()))
+                    .url(this.getCanonicalEventUrl(item.getName(), item.getParent().getUrl()))
                     .data(item)
                     .build());
         }
@@ -114,7 +102,7 @@ public class GenericEventItemListener extends ItemListener {
             eventSender.send(new Event.EventBuilder()
                     .type("item.deleted")
                     .source(item.getParent().getUrl())
-                    .url(this.getCanonicalEventUrl(item.getName()))
+                    .url(this.getCanonicalEventUrl(item.getName(), item.getParent().getUrl()))
                     .data(item)
                     .build());
         }
@@ -127,7 +115,7 @@ public class GenericEventItemListener extends ItemListener {
             eventSender.send(new Event.EventBuilder()
                     .type("item.updated")
                     .source(item.getParent().getUrl())
-                    .url(this.getCanonicalEventUrl(item.getName()))
+                    .url(this.getCanonicalEventUrl(item.getName(), item.getParent().getUrl()))
                     .data(item)
                     .build());
         }
@@ -144,7 +132,7 @@ public class GenericEventItemListener extends ItemListener {
                     .metaData(new MetaData.MetaDataBuilder()
                             .oldName(oldFullName)
                             .newName(newFullName)
-                            .oldUrl(this.getCanonicalEventUrl(oldFullName))
+                            .oldUrl(this.getCanonicalEventUrl(oldFullName, item.getParent().getUrl()))
                             .newUrl(this.getCanonicalEventUrlNewLocation(item, newFullName))
                             .build())
                     .build());
