@@ -1,10 +1,10 @@
 package io.jenkins.plugins.generic.event;
 
+import hudson.Util;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Event structure.
@@ -91,7 +91,7 @@ public class Event {
         }
 
         public Event build() {
-            if (StringUtils.isBlank(dataType) && data != null) {
+            if (Util.fixEmptyAndTrim(dataType) == null && data != null) {
                 dataType = data.getClass().getName();
             }
             id = UUID.randomUUID().toString();

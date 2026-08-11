@@ -4,7 +4,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
@@ -22,6 +21,7 @@ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.TimeValue;
+import hudson.Util;
 
 /**
  * An implementation of EventSender, which sends event body via HTTP.
@@ -39,7 +39,7 @@ public class HttpEventSender implements EventSender {
 
         final String receiver = EventGlobalConfiguration.get().getReceiver();
 
-        if (StringUtils.isBlank(receiver)) {
+        if (Util.fixEmptyAndTrim(receiver) == null) {
             logger.info("Skipped event sending due to receiver URL not set");
             return;
         }
