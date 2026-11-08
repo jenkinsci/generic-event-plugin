@@ -1,5 +1,6 @@
 package io.jenkins.plugins.generic.event.listener;
 
+import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.ExtensionList;
 import hudson.model.FreeStyleProject;
 import hudson.model.Item;
@@ -8,7 +9,10 @@ import hudson.model.listeners.ItemListener;
 import io.jenkins.plugins.generic.event.Event;
 import io.jenkins.plugins.generic.event.EventGlobalConfiguration;
 import io.jenkins.plugins.generic.event.EventSender;
+import io.jenkins.plugins.generic.event.MetaData;
 import jenkins.model.JenkinsLocationConfiguration;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +59,62 @@ class ItemListenerTest {
         verify(mockSender, times(1)).send(any(Event.class));
         assertNull(r.jenkins.getItemByFullName("folder/old-job-name"));
         assertSame(r.jenkins.getItemByFullName("folder/new-job-name"), project);
+    }
+
+    @Test
+    void locationChangedEventContainsRenameMetadata() throws Exception {
+        MockFolder folder = r.createFolder("folder");
+        FreeStyleProject project = folder.createProject(FreeStyleProject.class, "old-name");
+        reset(mockSender);
+
+        // Rename via an HTTP request so that the listener sees a current Stapler request
+        // and can build the canonical old URL.
+        renameThroughWebClient(project, "new-name");
+
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(mockSender, times(1)).send(eventCaptor.capture());
+
+        Event event = eventCaptor.getValue();
+        assertEquals("item.locationChanged", event.getType());
+        assertEquals("job/folder/", event.getSource());
+        assertSame(project, event.getData());
+
+        MetaData metaData = event.getMetaData();
+        assertNotNull(metaData);
+        assertEquals("folder/old-name", metaData.getOldName());
+        assertEquals("folder/new-name", metaData.getNewName());
+        assertEquals("job/folder/job/old-name/", metaData.getOldUrl());
+        assertEquals("job/folder/job/new-name/", metaData.getNewUrl());
+
+        assertNull(r.jenkins.getItemByFullName("folder/old-name"));
+        assertSame(project, r.jenkins.getItemByFullName("folder/new-name"));
+    }
+
+    @Test
+    void locationChangedEventContainsFolderRenameMetadata() throws Exception {
+        Folder folder = r.createProject(Folder.class, "folder");
+        Folder subFolder = folder.createProject(Folder.class, "old-subfolder");
+        reset(mockSender);
+
+        renameThroughWebClient(subFolder, "new-subfolder");
+
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(mockSender, times(1)).send(eventCaptor.capture());
+
+        Event event = eventCaptor.getValue();
+        assertEquals("item.locationChanged", event.getType());
+        assertEquals("job/folder/", event.getSource());
+        assertSame(subFolder, event.getData());
+
+        MetaData metaData = event.getMetaData();
+        assertNotNull(metaData);
+        assertEquals("folder/old-subfolder", metaData.getOldName());
+        assertEquals("folder/new-subfolder", metaData.getNewName());
+        assertEquals("job/folder/job/old-subfolder/", metaData.getOldUrl());
+        assertEquals("job/folder/job/new-subfolder/", metaData.getNewUrl());
+
+        assertNull(r.jenkins.getItemByFullName("folder/old-subfolder"));
+        assertSame(subFolder, r.jenkins.getItemByFullName("folder/new-subfolder"));
     }
 
     @Test
@@ -215,6 +275,13 @@ class ItemListenerTest {
         assertNews("deleted=folder");
         verify(mockSender, times(1)).send(any(Event.class));
         assertNull(r.jenkins.getItemByFullName("folder"));
+    }
+
+    private void renameThroughWebClient(Item item, String newName) throws Exception {
+        HtmlPage page = r.createWebClient().getPage(item, "confirm-rename");
+        HtmlForm form = page.getFormByName("config");
+        form.getInputByName("newName").setValueAttribute(newName);
+        r.submit(form);
     }
 
     private void assertNews(String expected) {
