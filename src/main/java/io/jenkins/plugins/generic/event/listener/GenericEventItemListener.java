@@ -132,7 +132,10 @@ public class GenericEventItemListener extends ItemListener {
                     .metaData(new MetaData.MetaDataBuilder()
                             .oldName(oldFullName)
                             .newName(newFullName)
-                            .oldUrl(this.getCanonicalEventUrl(oldFullName, item.getParent().getUrl()))
+                            .oldUrl(Stapler.getCurrentRequest2() == null ? "" :
+                                    java.util.Arrays.stream(oldFullName.split("/"))
+                                            .map(name -> "job/" + Util.rawEncode(name) + "/")
+                                            .collect(java.util.stream.Collectors.joining()))
                             .newUrl(this.getCanonicalEventUrlNewLocation(item, newFullName))
                             .build())
                     .build());
